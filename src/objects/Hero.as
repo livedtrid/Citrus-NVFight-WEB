@@ -1,5 +1,7 @@
 package objects {
 		
+		import citrus.core.CitrusEngine;
+		import citrus.input.controllers.Keyboard;
 		import citrus.objects.CitrusSprite;
 		
 		//import games.hungryhero.GameConstants;
@@ -15,6 +17,7 @@ package objects {
 			/** State of the hero. */
 			public var state:int;
 			public var camTarget:Object = { x: 0, y: 0 };
+			private var playerSpeed:int =10;
 			
 			public function Hero(name:String, params:Object=null)
 			{
@@ -25,6 +28,7 @@ package objects {
 				
 				// Initialize hero art and hit area.
 				createHeroArt();
+				
 			}
 			
 			/**
@@ -64,7 +68,6 @@ package objects {
 				//camTarget.x = _body.position.x;
 				//camTarget.y = _body.position.y;
 				
-
 			}
 		}
 	}

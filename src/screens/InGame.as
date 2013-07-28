@@ -7,6 +7,8 @@ package screens
 	import citrus.core.starling.StarlingState;
 	import citrus.input.controllers.Keyboard;
 	import citrus.input.controllers.TimeShifter;
+	import citrus.view.ACitrusCamera;
+	import citrus.view.starlingview.StarlingCamera;
 	
 	import core.Assets;
 	
@@ -64,15 +66,14 @@ package screens
 		
 		/** Buffer */
 		private var timeshifter:TimeShifter;
-
+		private var _camera:ACitrusCamera;
+		private var _bounds:Rectangle;
+		
 		
 		
 		// ------------------------------------------------------------------------------------------------------------
 		// METHODS
 		// ------------------------------------------------------------------------------------------------------------
-		
-
-		
 		public function InGame()
 		{
 			super();
@@ -88,7 +89,7 @@ package screens
 			drawGame();
 			drawHUD();
 			
-			// Define keyboard interactions
+			// Define keyboard interactions - moved to the Hero class
 			CitrusEngine.getInstance().input.keyboard.addKeyAction("left", Keyboard.LEFT);
 			CitrusEngine.getInstance().input.keyboard.addKeyAction("right", Keyboard.RIGHT);
 			CitrusEngine.getInstance().input.keyboard.addKeyAction("down", Keyboard.DOWN);
@@ -101,7 +102,7 @@ package screens
 			// Reset hit, camera shake and player speed.
 			getHit = 0;
 			cameraShake = 0;
-			playerSpeed = 1;
+			playerSpeed = 10;
 			
 			// Hero's initial position
 			hero.x = stage.stageWidth/2;
@@ -116,10 +117,22 @@ package screens
 			
 			
 			// Setup Camera
-			timeshifter.addBufferSet( { object:hero.camTarget, continuous:["x", "y"] } );
-			
+			//timeshifter.addBufferSet( { object:hero.camTarget, continuous:["x", "y"] } );
+			/*
 			view.camera.setUp(hero, new Point(stage.stageWidth / 2  , stage.stageHeight / 2 ),
-				new Rectangle(0, 0, 2400, 1200), new Point(.25, .25));
+				new Rectangle(0, 0, 1600, 600), new Point(.25, .25));
+			*/
+			//camera setup
+			bg.parallaxX = bg.parallaxY = 0.5;
+			_bounds = new Rectangle(0, 0, 1600, 480);
+			_camera = view.camera as StarlingCamera;
+			_camera.setUp(hero, new Point(stage.stageWidth / 2 - 150, stage.stageHeight / 2 + 50), _bounds, new Point(0.05, 0.05));
+			_camera.allowRotation = true;
+			_camera.allowZoom = true;
+			
+		
+			_camera.parallaxMode = ACitrusCamera.PARALLAX_MODE_DEPTH;
+			//_camera.boundsMode = ACitrusCamera.BOUNDS_MODE_AABB;
 		}
 		
 		private function drawHUD():void
@@ -163,26 +176,34 @@ package screens
 		override public function update(timeDelta:Number):void {
 			super.update(timeDelta);
 			elapsed = timeDelta;
-			/*
-			if (CitrusEngine.getInstance().input.justDid("left"))
+			
+			//set the background velocity
+			bg.speed = playerSpeed * elapsed;
+			
+			if (CitrusEngine.getInstance().input.isDoing("left"))
 			{	
 					//walkLeft=true
 					//walkRight=false
 				hero.x -= 5 * playerSpeed;
+				
+				if(hero.inverted == false)
+					hero.inverted=true;
 			}
-			if (CitrusEngine.getInstance().input.justDid("right"))
+			if (CitrusEngine.getInstance().input.isDoing("right"))
 			{	
 				hero.x += 5 * playerSpeed;
+				if(hero.inverted == true)
+					hero.inverted=false;
 			}
-			if (CitrusEngine.getInstance().input.justDid("up"))
+			if (CitrusEngine.getInstance().input.isDoing("up"))
 			{		
 				hero.y -= 5 * playerSpeed;
 			}
-			if (CitrusEngine.getInstance().input.justDid("down"))
+			if (CitrusEngine.getInstance().input.isDoing("down"))
 			{	
 				hero.y += 5 * playerSpeed;
 			}
-			*/
+			
 				
 		}
 	}
