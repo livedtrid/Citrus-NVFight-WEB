@@ -63,36 +63,36 @@ package objects{
 			 */
 			override public function update(timeDelta:Number):void {
 				super.update(timeDelta);
-				
+				bgLayer2.x -= Math.ceil(speed * bgLayer2.parallaxDepth);
 				if (!gamePaused)
 				{
 					// Background 1 - Sky
 					bgLayer1.x -= Math.ceil(speed * bgLayer1.parallaxDepth);
 					// Hero flying left
-					if (bgLayer1.x > 0) bgLayer1.x = -_ce.stage.stageWidth;
+					//if (bgLayer1.x > 0) bgLayer1.x = -_ce.stage.stageWidth;
 					// Hero flying right
-					if (bgLayer1.x < -_ce.stage.stageWidth ) bgLayer1.x = 0;
+					//if (bgLayer1.x < -_ce.stage.stageWidth ) bgLayer1.x = 0;
 					
 					// Background 2 - Hills
 					bgLayer2.x -= Math.ceil(speed * bgLayer2.parallaxDepth);
 					// Hero flying left
-					if (bgLayer2.x > 0) bgLayer2.x = -_ce.stage.stageWidth;
+					//if (bgLayer2.x > 0) bgLayer2.x = -_ce.stage.stageWidth;
 					// Hero flying right
-					if (bgLayer2.x < -_ce.stage.stageWidth ) bgLayer2.x = 0;
+					//if (bgLayer2.x < -_ce.stage.stageWidth ) bgLayer2.x = 0;
 					
 					// Background 3 - Buildings
 					bgLayer3.x -= Math.ceil(speed * bgLayer3.parallaxDepth);
 					// Hero flying left
-					if (bgLayer3.x > 0) bgLayer3.x = -_ce.stage.stageWidth;
+					//if (bgLayer3.x > 0) bgLayer3.x = -_ce.stage.stageWidth;
 					// Hero flying right
-					if (bgLayer3.x < -_ce.stage.stageWidth ) bgLayer3.x = 0;
+					//if (bgLayer3.x < -_ce.stage.stageWidth ) bgLayer3.x = 0;
 					
 					// Background 4 - Trees
 					bgLayer4.x -= Math.ceil(speed * bgLayer4.parallaxDepth);
 					// Hero flying left
-					if (bgLayer4.x > 0) bgLayer4.x = -_ce.stage.stageWidth;
+					//if (bgLayer4.x > 0) bgLayer4.x = -_ce.stage.stageWidth;
 					// Hero flying right
-					if (bgLayer4.x < -_ce.stage.stageWidth ) bgLayer4.x = 0;
+					//if (bgLayer4.x < -_ce.stage.stageWidth ) bgLayer4.x = 0;
 				}
 			}
 		}

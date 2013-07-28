@@ -102,7 +102,7 @@ package screens
 			// Reset hit, camera shake and player speed.
 			getHit = 0;
 			cameraShake = 0;
-			playerSpeed = 10;
+			playerSpeed = 2;
 			
 			// Hero's initial position
 			hero.x = stage.stageWidth/2;
@@ -112,26 +112,13 @@ package screens
 			gamePaused = false;
 			bg.gamePaused = false;
 			
-			// we register a buffer of 20 seconds.
-			timeshifter = new TimeShifter(20);
-			
-			
-			// Setup Camera
-			//timeshifter.addBufferSet( { object:hero.camTarget, continuous:["x", "y"] } );
-			/*
-			view.camera.setUp(hero, new Point(stage.stageWidth / 2  , stage.stageHeight / 2 ),
-				new Rectangle(0, 0, 1600, 600), new Point(.25, .25));
-			*/
-			//camera setup
-			bg.parallaxX = bg.parallaxY = 0.5;
 			_bounds = new Rectangle(0, 0, 1600, 480);
 			_camera = view.camera as StarlingCamera;
 			_camera.setUp(hero, new Point(stage.stageWidth / 2 - 150, stage.stageHeight / 2 + 50), _bounds, new Point(0.05, 0.05));
-			_camera.allowRotation = true;
+			//_camera.allowRotation = true;
 			_camera.allowZoom = true;
 			
-		
-			_camera.parallaxMode = ACitrusCamera.PARALLAX_MODE_DEPTH;
+			//_camera.parallaxMode = ACitrusCamera.PARALLAX_MODE_DEPTH;
 			//_camera.boundsMode = ACitrusCamera.BOUNDS_MODE_AABB;
 		}
 		
@@ -179,6 +166,7 @@ package screens
 			
 			//set the background velocity
 			bg.speed = playerSpeed * elapsed;
+			trace(bg.speed);
 			
 			if (CitrusEngine.getInstance().input.isDoing("left"))
 			{	
