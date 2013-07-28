@@ -14,6 +14,7 @@ package objects {
 		{		
 			/** State of the hero. */
 			public var state:int;
+			public var camTarget:Object = { x: 0, y: 0 };
 			
 			public function Hero(name:String, params:Object=null)
 			{
@@ -56,6 +57,14 @@ package objects {
 			override public function get height():Number
 			{
 				return _view ? view.texture.height : NaN;
+			}
+			
+			override public function update(timeDelta:Number):void
+			{
+				//camTarget.x = _body.position.x;
+				//camTarget.y = _body.position.y;
+				
+
 			}
 		}
 	}

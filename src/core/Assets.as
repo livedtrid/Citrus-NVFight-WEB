@@ -28,7 +28,7 @@ package core{
 			/**
 			 * Background Assets 
 			 */
-			[Embed(source="assets/bgLayer1.jpg")]
+			[Embed(source="assets/bgLayer1.png")]
 			public static const BgLayer1:Class;
 			
 			/**
