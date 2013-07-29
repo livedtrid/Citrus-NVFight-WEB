@@ -18,6 +18,7 @@ package screens
 	import starling.core.Starling;
 	import starling.display.MovieClip;
 	import starling.events.Event;
+	import citrus.objects.CitrusSprite;
 	
 	public class InGame extends StarlingState
 	{
@@ -74,6 +75,8 @@ package screens
 		// ------------------------------------------------------------------------------------------------------------
 		// METHODS
 		// ------------------------------------------------------------------------------------------------------------
+		
+		
 		public function InGame()
 		{
 			super();
@@ -97,12 +100,24 @@ package screens
 
 			
 			// Define game area.
-			gameArea = new Rectangle(0, 100, stage.stageWidth, stage.stageHeight - 250);
+			gameArea = new Rectangle(100, 50, 1300, stage.stageHeight -50);
+			
+			var bq:Quad = new Quad(1300, 430, 0xE5E5E5);
+			//do some linear gradient using VertexColor
+			bq.setVertexColor(0, 0x666666);
+			bq.setVertexColor(1, 0x666667);
+			bq.setVertexColor(2, 0x666668);
+			bq.setVertexColor(3, 0x666669);
+			
+		
+			
+			//add(new CitrusSprite("background", { x: 100, y: 50, width: 1300, height: 430, view: bq } ));
+			
 			
 			// Reset hit, camera shake and player speed.
 			getHit = 0;
 			cameraShake = 0;
-			playerSpeed = 2;
+			playerSpeed = 0.5;
 			
 			// Hero's initial position
 			hero.x = stage.stageWidth/2;
@@ -135,7 +150,7 @@ package screens
 			add(bg);
 			
 			// Draw hero.
-			hero = new Hero("hero", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 8)});
+			hero = new Hero("hero", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
 			add(hero);
 			
 		}
@@ -192,7 +207,24 @@ package screens
 				hero.y += 5 * playerSpeed;
 			}
 			
+			// Confine the hero to stage area limit
+			if (hero.y > gameArea.bottom - hero.height * 0.5)    
+			{
+				hero.y = gameArea.bottom - hero.height * 0.5;
 				
+			}
+			if (hero.y < gameArea.top + hero.height * 0.5)    
+			{
+				hero.y = gameArea.top + hero.height * 0.5;
+			}
+			if (hero.x < gameArea.left + hero.width * 0.5)    
+			{
+				hero.x = gameArea.left + hero.width * 0.5;
+			}
+			if (hero.x > gameArea.right + hero.width * 0.5)    
+			{
+				hero.x = gameArea.right + hero.width * 0.5;
+			}
 		}
 	}
 }

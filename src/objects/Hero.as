@@ -14,8 +14,8 @@ package objects {
 		{		
 			/** State of the hero. */
 			public var state:int;
-			public var camTarget:Object = { x: 0, y: 0 };
-			private var playerSpeed:int =2;
+			//public var camTarget:Object = { x: 0, y: 0 };
+			private var playerSpeed:int =1;
 			
 			public function Hero(name:String, params:Object=null)
 			{
