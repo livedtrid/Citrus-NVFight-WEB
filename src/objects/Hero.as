@@ -14,7 +14,6 @@ package objects {
 		{		
 			/** State of the hero. */
 			public var state:int;
-			//public var camTarget:Object = { x: 0, y: 0 };
 			private var playerSpeed:int =1;
 			
 			public function Hero(name:String, params:Object=null)
@@ -22,7 +21,7 @@ package objects {
 				super(name, params);
 				
 				// Set the game state to idle.
-			//	this.state = GameConstants.GAME_STATE_IDLE;
+				// this.state = GameConstants.GAME_STATE_IDLE;
 				
 				// Initialize hero art and hit area.
 				createHeroArt();

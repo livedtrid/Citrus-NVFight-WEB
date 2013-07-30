@@ -19,6 +19,7 @@ package screens
 	import starling.display.MovieClip;
 	import starling.events.Event;
 	import citrus.objects.CitrusSprite;
+	import starling.display.Quad;
 	
 	public class InGame extends StarlingState
 	{
@@ -100,24 +101,23 @@ package screens
 
 			
 			// Define game area.
-			gameArea = new Rectangle(100, 50, 1300, stage.stageHeight -50);
+			gameArea = new Rectangle(200, 50, 1100, stage.stageHeight -50);
 			
-			var bq:Quad = new Quad(1300, 430, 0xE5E5E5);
+			
+			// Define game area with a custom quad
+			//var bq:Quad = new Quad(1300, 430, 0xE5E5E5);
 			//do some linear gradient using VertexColor
-			bq.setVertexColor(0, 0x666666);
-			bq.setVertexColor(1, 0x666667);
-			bq.setVertexColor(2, 0x666668);
-			bq.setVertexColor(3, 0x666669);
-			
-		
-			
+			//bq.setVertexColor(0, 0x666666);
+			//bq.setVertexColor(1, 0x666667);
+			//bq.setVertexColor(2, 0x666668);
+			//bq.setVertexColor(3, 0x666669);
 			//add(new CitrusSprite("background", { x: 100, y: 50, width: 1300, height: 430, view: bq } ));
 			
 			
 			// Reset hit, camera shake and player speed.
 			getHit = 0;
 			cameraShake = 0;
-			playerSpeed = 0.5;
+			playerSpeed = 0.8;
 			
 			// Hero's initial position
 			hero.x = stage.stageWidth/2;
@@ -127,9 +127,9 @@ package screens
 			gamePaused = false;
 			bg.gamePaused = false;
 			
-			_bounds = new Rectangle(0, 0, 1600, 480);
+			_bounds = new Rectangle(0, 0, 1700, 480); //camera boundaries
 			_camera = view.camera as StarlingCamera;
-			_camera.setUp(hero, new Point(stage.stageWidth / 2 - 150, stage.stageHeight / 2 + 50), _bounds, new Point(0.05, 0.05));
+			_camera.setUp(hero, new Point(stage.stageWidth / 2, stage.stageHeight / 2), _bounds, new Point(0.05, 0.05));
 			//_camera.allowRotation = true;
 			_camera.allowZoom = true;
 			
@@ -179,14 +179,18 @@ package screens
 			super.update(timeDelta);
 			elapsed = timeDelta;
 			
+			bg.update(timeDelta);
+			bg.speed = 0;
+			
+			
+			
 			//set the background velocity
-			bg.speed = playerSpeed * elapsed;
-			trace(bg.speed);
+			
 			
 			if (CitrusEngine.getInstance().input.isDoing("left"))
 			{	
-					//walkLeft=true
-					//walkRight=false
+				bg.speed = playerSpeed * elapsed * -1;
+				
 				hero.x -= 5 * playerSpeed;
 				
 				if(hero.inverted == false)
@@ -194,6 +198,8 @@ package screens
 			}
 			if (CitrusEngine.getInstance().input.isDoing("right"))
 			{	
+				bg.speed = playerSpeed * elapsed;
+				
 				hero.x += 5 * playerSpeed;
 				if(hero.inverted == true)
 					hero.inverted=false;
@@ -219,10 +225,12 @@ package screens
 			}
 			if (hero.x < gameArea.left + hero.width * 0.5)    
 			{
+				bg.speed = 0;
 				hero.x = gameArea.left + hero.width * 0.5;
 			}
 			if (hero.x > gameArea.right + hero.width * 0.5)    
 			{
+				bg.speed = 0;
 				hero.x = gameArea.right + hero.width * 0.5;
 			}
 		}
