@@ -20,6 +20,7 @@ package screens
 	import starling.events.Event;
 	import citrus.objects.CitrusSprite;
 	import starling.display.Quad;
+	import objects.NVquad;
 	
 	public class InGame extends StarlingState
 	{
@@ -105,13 +106,13 @@ package screens
 			
 			
 			// Define game area with a custom quad
-			//var bq:Quad = new Quad(1300, 430, 0xE5E5E5);
+			var bq:Quad = new NVquad(1300, 430,100, 800, 0xE5E5E5);
 			//do some linear gradient using VertexColor
-			//bq.setVertexColor(0, 0x666666);
-			//bq.setVertexColor(1, 0x666667);
-			//bq.setVertexColor(2, 0x666668);
-			//bq.setVertexColor(3, 0x666669);
-			//add(new CitrusSprite("background", { x: 100, y: 50, width: 1300, height: 430, view: bq } ));
+			bq.setVertexColor(0, 0x666666);
+			bq.setVertexColor(1, 0x666667);
+			bq.setVertexColor(2, 0x666668);
+			bq.setVertexColor(3, 0x666669);
+			add(new CitrusSprite("background", { x: 100, y: 50, width: 1300, height: 430, view: bq } ));
 			
 			
 			// Reset hit, camera shake and player speed.
