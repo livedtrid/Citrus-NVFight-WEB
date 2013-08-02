@@ -18,11 +18,10 @@ package screens
 	import objects.NVquad;
 	
 	import starling.core.Starling;
-	import starling.display.DisplayObject;
 	import starling.display.MovieClip;
-	import starling.display.Quad;
 	import starling.events.Event;
-	
+	import starling.display.Shape;
+
 	public class InGame extends StarlingState
 	{
 		
@@ -98,6 +97,9 @@ package screens
 		// METHODS
 		// ------------------------------------------------------------------------------------------------------------
 		private var myQuad:CitrusSprite;
+		private var _top:Rectangle;
+		private var _bottom:Rectangle;
+		private var rectangle:Shape;
 		public function InGame()
 		{
 			super();
@@ -121,36 +123,47 @@ package screens
 
 			
 			// Define game area.
-			//gameArea = new Rectangle(200, 50, 1100, stage.stageHeight -50);
+			_top 		= new Rectangle(300, 200, 900, 20);
+			_bottom  	= new Rectangle(40, 480, 1560, 20);
+			_alturaY 	= _bottom.y - _top.y;
+			_ladoEsq 	= _top.x - _bottom.x;
+			_ladoDir 	= (_bottom.x + _bottom.width) - (_top.x + _top.width) ; 
+			
+			
+			rectangle = new Shape; // initializing the variable named rectangle
+			rectangle.graphics.beginFill(0xFF0000); // choosing the colour for the fill, here it is red
+			rectangle.graphics.drawRect(0, 470, 1600,20); // (x spacing, y spacing, width, height)
+			rectangle.graphics.endFill(); // not always needed but I like to put it in to end the fill
+			addChild(rectangle); // adds the rectangle to the stage
+			
+			
 			// Define game area with a custom quad
-			_quadWidth = 1600;
-			_quadHeight = 294;
-			_quadTopLeft = 254;
-			_quadTopRight = 1346;
+			//_quadWidth = 1600;
+			//_quadHeight = 294;
+			//_quadTopLeft = 254;
+			//_quadTopRight = 1346;
 			
-			bq = new NVquad(_quadWidth, _quadHeight, _quadTopLeft, _quadTopRight, 0xE5E5E5);
-			gameArea = bq.getBounds(bq);
-			
+			//bq = new NVquad(_quadWidth, _quadHeight, _quadTopLeft, _quadTopRight, 0xE5E5E5);
+			//gameArea = bq.getBounds(bq);
 			//draw the quad
-			myQuad = new CitrusSprite("quad", { x: 0, y: 180, width: 1600, height: 480, view: bq } )
-		add(myQuad);
+			//myQuad = new CitrusSprite("quad", { x: 0, y: 180, width: 1600, height: 294, view: bq } )
+			//add(myQuad);
+			//add(new CitrusSprite("background", { x: 0, y: 180, width: 1600, height: 294, view: bq } ));
+			//_alturaY 			= (myQuad.y + myQuad.height) - myQuad.y; // constrains player in height
+			// LATERAL ESQUERDA
+			//_ladoEsq			= _quadTopLeft - myQuad.x;  //
+			// LATERAL DIREITA
+			//_ladoDir			= (myQuad.x + myQuad.width) - (_quadTopRight) ;  // pode ser colocado no inicio
 			
 
-			//add(new CitrusSprite("background", { x: 0, y: 180, width: 1600, height: 294, view: bq } ));
-			
-			_alturaY 			= (myQuad.y + myQuad.height) - myQuad.y; // constrains player in height
-			// LATERAL ESQUERDA
-			_ladoEsq			= _quadTopLeft - myQuad.x;  //
-			// LATERAL DIREITA
-			_ladoDir			= (myQuad.x + myQuad.width) - (_quadTopRight) ;  // pode ser colocado no inicio
-			
+						
 			// Reset hit, camera shake and player speed.
 			getHit = 0;
 			cameraShake = 0;
 			playerSpeed = 0.8;
 			
 			// Hero's initial position
-			hero.x = stage.stageWidth/2 +200;
+			hero.x = stage.stageWidth/2;
 			hero.y = stage.stageHeight/2;
 			
 			// Reset game paused states.
@@ -163,8 +176,8 @@ package screens
 			//_camera.allowRotation = true;
 			_camera.allowZoom = true;
 			
-			_camera.parallaxMode = ACitrusCamera.PARALLAX_MODE_TOPLEFT;
-			_camera.boundsMode = ACitrusCamera.BOUNDS_MODE_AABB;
+			//_camera.parallaxMode = ACitrusCamera.PARALLAX_MODE_TOPLEFT;
+			//_camera.boundsMode = ACitrusCamera.BOUNDS_MODE_AABB;
 		}
 		
 		private function drawHUD():void
@@ -182,6 +195,7 @@ package screens
 			// Draw hero.
 			hero = new Hero("hero", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
 			add(hero);
+		
 			
 			
 			
@@ -217,7 +231,7 @@ package screens
 			// Confine the hero to stage area limit
 			
 			// Height
-			_alturaYAtual 		= hero.y - myQuad.y; // verificar a altura do quad
+			_alturaYAtual 		= hero.y - _top.top; // verificar a altura do quad
 			_alturaYAtualPerc 	= (_alturaYAtual * 100)/_alturaY;
 			
 			// Left side
@@ -229,7 +243,7 @@ package screens
 						
 			if (CitrusEngine.getInstance().input.isDoing("left"))
 			{					
-				if ((hero.x + 5)  >= (_quadTopLeft + (hero.width/2)  ) + _ladoEsqOffset ){
+				if ((hero.x + 5)  >= (_bottom.x + (hero.width/2)  ) + _ladoEsqOffset ){
 					hero.x -= 5 * playerSpeed; // move the player to the left
 					bg.speed = playerSpeed * elapsed * -1; //move background to the right
 				}else{
@@ -242,7 +256,7 @@ package screens
 			
 			if (CitrusEngine.getInstance().input.isDoing("right"))
 			{	
-				if ((hero.x + 5)  <= (myQuad.x + myQuad.width ) - _ladoDirOffset){
+				if ((hero.x + 5)  <= (_bottom.x + _bottom.width ) - _ladoDirOffset){
 					hero.x += 5 * playerSpeed; // move the player to the right
 					bg.speed = playerSpeed * elapsed; //move background to the left
 				}else{
@@ -255,7 +269,7 @@ package screens
 			
 			if (CitrusEngine.getInstance().input.isDoing("up"))
 			{	
-					if((hero.y + 5) >= myQuad.y &&((hero.x + 5)  >= (_quadTopLeft + (hero.width/2)  )+ _ladoEsqOffset )&&((hero.x + 5)  <= (myQuad.x + myQuad.width ) - _ladoDirOffset)){
+					if((hero.y + (hero.height >> 1) - 5) >= _top.top ){
 					hero.y -= 5 * playerSpeed;
 				}else{
 					hero.y-=0;
@@ -266,7 +280,7 @@ package screens
 			if (CitrusEngine.getInstance().input.isDoing("down"))
 			{	
 				
-				if((hero.y + 5) <= (myQuad.y + myQuad.height)){
+				if((hero.y + (hero.height >> 1) + 5) <= (_bottom.y)){
 					hero.y += 5 * playerSpeed;
 				}else{
 					hero.y +=0;
@@ -294,14 +308,19 @@ package screens
 				hero.x = gameArea.right + hero.width * 0.5;
 			}
 			*/
-			trace("hero.y= " +hero.y);
-			trace("hero.x= " +hero.x);
-			trace("_quadTopLeft= " + _quadTopLeft);
-			trace("quad.x= " + myQuad.x);
-			trace("quad.y= " + myQuad.y);
-			trace("quad.width= " + myQuad.width);
-			trace("quad.height= " + myQuad.height);
-			
+			trace("hero.y" + hero.y);
+			trace("hero.x" + hero.x);
+			trace("_bottom.x" + _bottom.x);
+			trace("_bottom.y" + _bottom.y);
+			trace("_bottom.width" + _bottom.width);
+			trace("_bottom.height" + _bottom.height);
+			trace("_top.y" + _top.y);
+			trace("_top.x" + _top.x);
+			trace("_top.width" + _top.width);
+			trace("_top.height" + _top.height);
+			trace("OffsetEsq" + _ladoEsqOffset);
+			trace("OffsetDir" + _ladoDirOffset);	
+	
 		}
 	}
 }

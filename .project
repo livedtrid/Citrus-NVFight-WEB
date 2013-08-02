@@ -14,4 +14,11 @@
 	<natures>
 		<nature>com.adobe.flexbuilder.project.actionscriptnature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>[source path] src</name>
+			<type>2</type>
+			<location>C:/Users/Hernani David/Documents/GitHub/Starling-Extension-Graphics/extension/src</location>
+		</link>
+	</linkedResources>
 </projectDescription>
