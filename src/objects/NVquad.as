@@ -11,14 +11,21 @@ package objects
 			
 			super(width, height,color,premultipliedAlpha);
 			
-			//mTinted = color != 0xffffff;
+		
 			
 			mVertexData = new VertexData(4, premultipliedAlpha);
 			mVertexData.setPosition(0, topleft, 0.0);
-			mVertexData.setPosition(1, width, topright);
+			mVertexData.setPosition(1, topright, 0.0);
 			mVertexData.setPosition(2, 0.0, height);
 			mVertexData.setPosition(3, width, height); 
 			mVertexData.setUniformColor(color);
+			
+		/*	
+			mVertexData.setPosition(0, 0.0, 0.0);
+			mVertexData.setPosition(1, width, 0.0);
+			mVertexData.setPosition(2, 0.0, height);
+			mVertexData.setPosition(3, width, height); 
+			*/
 			
 			onVertexDataChanged();
 		}

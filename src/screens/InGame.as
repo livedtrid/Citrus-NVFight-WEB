@@ -7,6 +7,7 @@ package screens
 	import citrus.core.starling.StarlingState;
 	import citrus.input.controllers.Keyboard;
 	import citrus.input.controllers.TimeShifter;
+	import citrus.objects.CitrusSprite;
 	import citrus.view.ACitrusCamera;
 	import citrus.view.starlingview.StarlingCamera;
 	
@@ -14,13 +15,13 @@ package screens
 	
 	import objects.GameBackground;
 	import objects.Hero;
+	import objects.NVquad;
 	
 	import starling.core.Starling;
+	import starling.display.DisplayObject;
 	import starling.display.MovieClip;
-	import starling.events.Event;
-	import citrus.objects.CitrusSprite;
 	import starling.display.Quad;
-	import objects.NVquad;
+	import starling.events.Event;
 	
 	public class InGame extends StarlingState
 	{
@@ -73,12 +74,30 @@ package screens
 		private var _bounds:Rectangle;
 		
 		
+		/** Constrains the gameArea */		
+		// Em altura é necessário saber onde o jogador está para a "regra 3 simples"
+		private var _alturaY:Number;
+		private var _alturaYAtual:Number;
+		private var _alturaYAtualPerc:Number;
 		
+		// Margem do lado esquerdo
+		private var _ladoEsq:Number;
+		private var _ladoEsqOffset:Number;
+		
+		// Margem do lado direito
+		private var _ladoDir:Number;
+		private var _ladoDirOffset:Number;	
+		
+		private var bq:NVquad;
+		private var _quadWidth:int;
+		private var _quadHeight:int;
+		private var _quadTopLeft:int;
+		private var _quadTopRight:int;
+
 		// ------------------------------------------------------------------------------------------------------------
 		// METHODS
 		// ------------------------------------------------------------------------------------------------------------
-		
-		
+		private var myQuad:CitrusSprite;
 		public function InGame()
 		{
 			super();
@@ -102,18 +121,28 @@ package screens
 
 			
 			// Define game area.
-			gameArea = new Rectangle(200, 50, 1100, stage.stageHeight -50);
-			
-			
+			//gameArea = new Rectangle(200, 50, 1100, stage.stageHeight -50);
 			// Define game area with a custom quad
-			var bq:Quad = new NVquad(1300, 430,100, 800, 0xE5E5E5);
-			//do some linear gradient using VertexColor
-			bq.setVertexColor(0, 0x666666);
-			bq.setVertexColor(1, 0x666667);
-			bq.setVertexColor(2, 0x666668);
-			bq.setVertexColor(3, 0x666669);
-			add(new CitrusSprite("background", { x: 100, y: 50, width: 1300, height: 430, view: bq } ));
+			_quadWidth = 1600;
+			_quadHeight = 294;
+			_quadTopLeft = 254;
+			_quadTopRight = 1346;
 			
+			bq = new NVquad(_quadWidth, _quadHeight, _quadTopLeft, _quadTopRight, 0xE5E5E5);
+			gameArea = bq.getBounds(bq);
+			
+			//draw the quad
+			myQuad = new CitrusSprite("quad", { x: 0, y: 180, width: 1600, height: 480, view: bq } )
+		add(myQuad);
+			
+
+			//add(new CitrusSprite("background", { x: 0, y: 180, width: 1600, height: 294, view: bq } ));
+			
+			_alturaY 			= (myQuad.y + myQuad.height) - myQuad.y; // constrains player in height
+			// LATERAL ESQUERDA
+			_ladoEsq			= _quadTopLeft - myQuad.x;  //
+			// LATERAL DIREITA
+			_ladoDir			= (myQuad.x + myQuad.width) - (_quadTopRight) ;  // pode ser colocado no inicio
 			
 			// Reset hit, camera shake and player speed.
 			getHit = 0;
@@ -121,21 +150,21 @@ package screens
 			playerSpeed = 0.8;
 			
 			// Hero's initial position
-			hero.x = stage.stageWidth/2;
+			hero.x = stage.stageWidth/2 +200;
 			hero.y = stage.stageHeight/2;
 			
 			// Reset game paused states.
 			gamePaused = false;
 			bg.gamePaused = false;
 			
-			_bounds = new Rectangle(0, 0, 1700, 480); //camera boundaries
+			_bounds = new Rectangle(0, 0, 1600, 480); //camera boundaries
 			_camera = view.camera as StarlingCamera;
 			_camera.setUp(hero, new Point(stage.stageWidth / 2, stage.stageHeight / 2), _bounds, new Point(0.05, 0.05));
 			//_camera.allowRotation = true;
 			_camera.allowZoom = true;
 			
-			//_camera.parallaxMode = ACitrusCamera.PARALLAX_MODE_DEPTH;
-			//_camera.boundsMode = ACitrusCamera.BOUNDS_MODE_AABB;
+			_camera.parallaxMode = ACitrusCamera.PARALLAX_MODE_TOPLEFT;
+			_camera.boundsMode = ACitrusCamera.BOUNDS_MODE_AABB;
 		}
 		
 		private function drawHUD():void
@@ -145,7 +174,7 @@ package screens
 		}
 		
 		private function drawGame():void
-		{
+		{				
 			// Draw background.
 			bg = new GameBackground("background");
 			add(bg);
@@ -153,6 +182,8 @@ package screens
 			// Draw hero.
 			hero = new Hero("hero", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
 			add(hero);
+			
+			
 			
 		}
 		
@@ -182,43 +213,71 @@ package screens
 			
 			bg.update(timeDelta);
 			bg.speed = 0;
+						
+			// Confine the hero to stage area limit
 			
+			// Height
+			_alturaYAtual 		= hero.y - myQuad.y; // verificar a altura do quad
+			_alturaYAtualPerc 	= (_alturaYAtual * 100)/_alturaY;
 			
-			
-			//set the background velocity
-			
-			
+			// Left side
+			_ladoEsqOffset		=(_ladoEsq*_alturaYAtualPerc) / 100;
+			_ladoEsqOffset		= -(_ladoEsqOffset-100);
+			// Right side
+			_ladoDirOffset		=(_ladoDir*_alturaYAtualPerc) / 100;
+			_ladoDirOffset		= -(_ladoDirOffset-100);
+						
 			if (CitrusEngine.getInstance().input.isDoing("left"))
-			{	
-				bg.speed = playerSpeed * elapsed * -1;
-				
-				hero.x -= 5 * playerSpeed;
-				
+			{					
+				if ((hero.x + 5)  >= (_quadTopLeft + (hero.width/2)  ) + _ladoEsqOffset ){
+					hero.x -= 5 * playerSpeed; // move the player to the left
+					bg.speed = playerSpeed * elapsed * -1; //move background to the right
+				}else{
+					hero.x -= 0; // stop player
+					bg.speed = 0; // stop background
+				}				
 				if(hero.inverted == false)
-					hero.inverted=true;
+				hero.inverted=true;
 			}
+			
 			if (CitrusEngine.getInstance().input.isDoing("right"))
 			{	
-				bg.speed = playerSpeed * elapsed;
-				
-				hero.x += 5 * playerSpeed;
+				if ((hero.x + 5)  <= (myQuad.x + myQuad.width ) - _ladoDirOffset){
+					hero.x += 5 * playerSpeed; // move the player to the right
+					bg.speed = playerSpeed * elapsed; //move background to the left
+				}else{
+					hero.x += 0; // stop player
+					bg.speed = 0; // stop background
+				}				
 				if(hero.inverted == true)
 					hero.inverted=false;
 			}
+			
 			if (CitrusEngine.getInstance().input.isDoing("up"))
-			{		
-				hero.y -= 5 * playerSpeed;
+			{	
+					if((hero.y + 5) >= myQuad.y &&((hero.x + 5)  >= (_quadTopLeft + (hero.width/2)  )+ _ladoEsqOffset )&&((hero.x + 5)  <= (myQuad.x + myQuad.width ) - _ladoDirOffset)){
+					hero.y -= 5 * playerSpeed;
+				}else{
+					hero.y-=0;
+					
+				}
+				
 			}
 			if (CitrusEngine.getInstance().input.isDoing("down"))
 			{	
-				hero.y += 5 * playerSpeed;
+				
+				if((hero.y + 5) <= (myQuad.y + myQuad.height)){
+					hero.y += 5 * playerSpeed;
+				}else{
+					hero.y +=0;
+				}
+				
 			}
-			
-			// Confine the hero to stage area limit
+
+			/*			
 			if (hero.y > gameArea.bottom - hero.height * 0.5)    
 			{
-				hero.y = gameArea.bottom - hero.height * 0.5;
-				
+				hero.y = gameArea.bottom - hero.height * 0.5;				
 			}
 			if (hero.y < gameArea.top + hero.height * 0.5)    
 			{
@@ -234,6 +293,15 @@ package screens
 				bg.speed = 0;
 				hero.x = gameArea.right + hero.width * 0.5;
 			}
+			*/
+			trace("hero.y= " +hero.y);
+			trace("hero.x= " +hero.x);
+			trace("_quadTopLeft= " + _quadTopLeft);
+			trace("quad.x= " + myQuad.x);
+			trace("quad.y= " + myQuad.y);
+			trace("quad.width= " + myQuad.width);
+			trace("quad.height= " + myQuad.height);
+			
 		}
 	}
 }

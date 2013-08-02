@@ -68,10 +68,9 @@ package objects{
 			if (!gamePaused)
 			{
 				// Background 1 - Sky
-							
-				bgLayer1.x -= (speed * bgLayer1.parallaxDepth * 500);
-				bgLayer2.x -= (speed * bgLayer2.parallaxDepth * 500);
-				bgLayer3.x -= (speed * bgLayer3.parallaxDepth * 500);
+				bgLayer1.x -= (speed * bgLayer1.parallaxDepth * 400);
+				bgLayer2.x -= (speed * bgLayer2.parallaxDepth * 400);
+				bgLayer3.x -= (speed * bgLayer3.parallaxDepth * 400);
 				
 	/*		
 			bgLayer1.x -=- Math.ceil(speed * bgLayer1.parallaxDepth);
