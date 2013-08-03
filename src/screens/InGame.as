@@ -123,8 +123,8 @@ package screens
 
 			
 			// Define game area.
-			_top 		= new Rectangle(300, 200, 900, 20);
-			_bottom  	= new Rectangle(40, 480, 1560, 20);
+			_top 		= new Rectangle(250, 200, 1100, 20);
+			_bottom  	= new Rectangle(50, 450, 1500, 20);
 			_alturaY 	= _bottom.y - _top.y;
 			_ladoEsq 	= _top.x - _bottom.x;
 			_ladoDir 	= (_bottom.x + _bottom.width) - (_top.x + _top.width) ; 
@@ -132,9 +132,9 @@ package screens
 			
 			rectangle = new Shape; // initializing the variable named rectangle
 			rectangle.graphics.beginFill(0xFF0000); // choosing the colour for the fill, here it is red
-			rectangle.graphics.drawRect(0, 470, 1600,20); // (x spacing, y spacing, width, height)
+			rectangle.graphics.drawRect(300, 200, 900,20); // (x spacing, y spacing, width, height)
 			rectangle.graphics.endFill(); // not always needed but I like to put it in to end the fill
-			addChild(rectangle); // adds the rectangle to the stage
+			//addChild(rectangle); // adds the rectangle to the stage
 			
 			
 			// Define game area with a custom quad
@@ -242,7 +242,8 @@ package screens
 			_ladoDirOffset		= -(_ladoDirOffset-100);
 						
 			if (CitrusEngine.getInstance().input.isDoing("left"))
-			{					
+			{			
+				
 				if ((hero.x + 5)  >= (_bottom.x + (hero.width/2)  ) + _ladoEsqOffset ){
 					hero.x -= 5 * playerSpeed; // move the player to the left
 					bg.speed = playerSpeed * elapsed * -1; //move background to the right
@@ -256,7 +257,8 @@ package screens
 			
 			if (CitrusEngine.getInstance().input.isDoing("right"))
 			{	
-				if ((hero.x + 5)  <= (_bottom.x + _bottom.width ) - _ladoDirOffset){
+				
+				if ((hero.x + 5)+ (hero.width)  <= (_bottom.x + _bottom.width ) - _ladoDirOffset){
 					hero.x += 5 * playerSpeed; // move the player to the right
 					bg.speed = playerSpeed * elapsed; //move background to the left
 				}else{
@@ -268,7 +270,20 @@ package screens
 			}
 			
 			if (CitrusEngine.getInstance().input.isDoing("up"))
-			{	
+			{
+				// Dont get stuck on wall when walking up on the right side
+				if ((hero.x + 5)+ (hero.width)  >= (_bottom.x + _bottom.width ) - _ladoDirOffset){
+					hero.x -= 5;
+					bg.speed = 0; // stop background need to be fixed
+				}
+
+				// Dont get stuck on wall when walking up on the left side
+				if ((hero.x + 5)  <= (_bottom.x + (hero.width/2)  ) + _ladoEsqOffset ){
+					hero.x += 5;
+					bg.speed = 0; // stop background need to be fixed
+				}
+	
+				
 					if((hero.y + (hero.height >> 1) - 5) >= _top.top ){
 					hero.y -= 5 * playerSpeed;
 				}else{
