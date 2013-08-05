@@ -1,8 +1,9 @@
-package objects{
+package objects.objects{
 	
 	import citrus.objects.CitrusSprite;
 	
 	import starling.display.Sprite;
+
 	/**
 	 * This class defines the whole InGame background containing multiple background layers.
 	 *  

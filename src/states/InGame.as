@@ -1,4 +1,4 @@
-package screens
+package states
 {
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
@@ -13,14 +13,14 @@ package screens
 	
 	import core.Assets;
 	
-	import objects.GameBackground;
-	import objects.Hero;
-	import objects.NVquad;
+	import objects.hero.Hero;
+	import objects.objects.GameBackground;
+	import objects.objects.NVquad;
 	
 	import starling.core.Starling;
 	import starling.display.MovieClip;
-	import starling.events.Event;
 	import starling.display.Shape;
+	import starling.events.Event;
 
 	public class InGame extends StarlingState
 	{
@@ -123,8 +123,8 @@ package screens
 
 			
 			// Define game area.
-			_top 		= new Rectangle(250, 200, 1100, 20);
-			_bottom  	= new Rectangle(50, 450, 1500, 20);
+			_top 		= new Rectangle(400, 200, 600, 20);
+			_bottom  	= new Rectangle(200, 450, 1000, 20);
 			_alturaY 	= _bottom.y - _top.y;
 			_ladoEsq 	= _top.x - _bottom.x;
 			_ladoDir 	= (_bottom.x + _bottom.width) - (_top.x + _top.width) ; 
@@ -132,9 +132,9 @@ package screens
 			
 			rectangle = new Shape; // initializing the variable named rectangle
 			rectangle.graphics.beginFill(0xFF0000); // choosing the colour for the fill, here it is red
-			rectangle.graphics.drawRect(300, 200, 900,20); // (x spacing, y spacing, width, height)
+			rectangle.graphics.drawRect(50, 450, 900,20); // (x spacing, y spacing, width, height)
 			rectangle.graphics.endFill(); // not always needed but I like to put it in to end the fill
-			//addChild(rectangle); // adds the rectangle to the stage
+			addChild(rectangle); // adds the rectangle to the stage
 			
 			
 			// Define game area with a custom quad
@@ -223,16 +223,22 @@ package screens
 		
 		override public function update(timeDelta:Number):void {
 			super.update(timeDelta);
+			
 			elapsed = timeDelta;
 			
 			bg.update(timeDelta);
+
 			bg.speed = 0;
+			hero.view.scaleX = hero.view.scaleY = (_alturaYAtualPerc * 0.01); 
+			
+			trace("_alturaYAtualPerc" + _alturaYAtualPerc);
+			trace("_alturaYAtual" + _alturaYAtual);
 						
 			// Confine the hero to stage area limit
 			
 			// Height
-			_alturaYAtual 		= hero.y - _top.top; // verificar a altura do quad
-			_alturaYAtualPerc 	= (_alturaYAtual * 100)/_alturaY;
+			_alturaYAtual 		= (hero.y + hero.height >> 1 ) - (_top.y); // verificar a altura do quad
+			_alturaYAtualPerc 	= (_alturaYAtual * 100)/_alturaY + 80;
 			
 			// Left side
 			_ladoEsqOffset		=(_ladoEsq*_alturaYAtualPerc) / 100;
@@ -246,7 +252,15 @@ package screens
 				
 				if ((hero.x + 5)  >= (_bottom.x + (hero.width/2)  ) + _ladoEsqOffset ){
 					hero.x -= 5 * playerSpeed; // move the player to the left
-					bg.speed = playerSpeed * elapsed * -1; //move background to the right
+					
+					//// stop background
+					if (hero.x <= 400 || hero.x >= 1200)
+					{
+						bg.speed = 0; // stop background
+					}else{
+						bg.speed = playerSpeed * elapsed * -1; //move background to the right
+					}
+					
 				}else{
 					hero.x -= 0; // stop player
 					bg.speed = 0; // stop background
@@ -256,11 +270,18 @@ package screens
 			}
 			
 			if (CitrusEngine.getInstance().input.isDoing("right"))
-			{	
-				
-				if ((hero.x + 5)+ (hero.width)  <= (_bottom.x + _bottom.width ) - _ladoDirOffset){
+			{					
+				if ((hero.x + 5) <= (_bottom.x + _bottom.width + (hero.width/2)) - _ladoDirOffset){
 					hero.x += 5 * playerSpeed; // move the player to the right
-					bg.speed = playerSpeed * elapsed; //move background to the left
+										
+					//// stop background
+					if (hero.x <= 500 || hero.x >= 1100)
+					{
+						bg.speed = 0; // stop background
+					}else{
+						bg.speed = playerSpeed * elapsed; //move background to the left
+					}
+					
 				}else{
 					hero.x += 0; // stop player
 					bg.speed = 0; // stop background
@@ -272,7 +293,7 @@ package screens
 			if (CitrusEngine.getInstance().input.isDoing("up"))
 			{
 				// Dont get stuck on wall when walking up on the right side
-				if ((hero.x + 5)+ (hero.width)  >= (_bottom.x + _bottom.width ) - _ladoDirOffset){
+				if ((hero.x + 5) >= (_bottom.x + _bottom.width + (hero.width/2) ) - _ladoDirOffset){
 					hero.x -= 5;
 					bg.speed = 0; // stop background need to be fixed
 				}
@@ -281,10 +302,8 @@ package screens
 				if ((hero.x + 5)  <= (_bottom.x + (hero.width/2)  ) + _ladoEsqOffset ){
 					hero.x += 5;
 					bg.speed = 0; // stop background need to be fixed
-				}
-	
-				
-					if((hero.y + (hero.height >> 1) - 5) >= _top.top ){
+				}				
+					if((hero.y + 5) >= _top.y ){
 					hero.y -= 5 * playerSpeed;
 				}else{
 					hero.y-=0;
@@ -325,16 +344,16 @@ package screens
 			*/
 			trace("hero.y" + hero.y);
 			trace("hero.x" + hero.x);
-			trace("_bottom.x" + _bottom.x);
-			trace("_bottom.y" + _bottom.y);
-			trace("_bottom.width" + _bottom.width);
-			trace("_bottom.height" + _bottom.height);
+			//trace("_bottom.x" + _bottom.x);
+			//trace("_bottom.y" + _bottom.y);
+			//trace("_bottom.width" + _bottom.width);
+			//trace("_bottom.height" + _bottom.height);
 			trace("_top.y" + _top.y);
-			trace("_top.x" + _top.x);
-			trace("_top.width" + _top.width);
-			trace("_top.height" + _top.height);
-			trace("OffsetEsq" + _ladoEsqOffset);
-			trace("OffsetDir" + _ladoDirOffset);	
+			//trace("_top.x" + _top.x);
+			//("_top.width" + _top.width);
+			//trace("_top.height" + _top.height);
+			//trace("OffsetEsq" + _ladoEsqOffset);
+			//trace("OffsetDir" + _ladoDirOffset);	
 	
 		}
 	}

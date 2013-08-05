@@ -1,4 +1,4 @@
-package objects{
+package objects.objects{
 		
 		import core.Assets;
 		

@@ -1,4 +1,4 @@
-package objects {
+package objects.hero {
 		
 		import citrus.objects.CitrusSprite;
 		
