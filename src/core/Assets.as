@@ -16,6 +16,11 @@ package core{
 		 */
 		public class Assets
 		{
+			
+			// Dragon Bones
+			//[Embed(source="assets/texture.png",mimeType="application/octet-stream")]
+		//	public static const ResourcesData:Class;
+			
 			/**
 			 * Texture Atlas 
 			 */

@@ -13,14 +13,19 @@ package states
 	
 	import core.Assets;
 	
+	import dragonBones.Armature;
+	import dragonBones.factorys.StarlingFactory;
+	
 	import objects.hero.Hero;
+	import objects.objects.Enemy;
 	import objects.objects.GameBackground;
-	import objects.objects.NVquad;
 	
 	import starling.core.Starling;
 	import starling.display.MovieClip;
-	import starling.display.Shape;
+	import starling.display.Sprite;
 	import starling.events.Event;
+	import starling.text.TextField;
+		
 
 	public class InGame extends StarlingState
 	{
@@ -30,6 +35,9 @@ package states
 		
 		/** Hero character. */		
 		private var hero:Hero;
+		
+		/** Enemy character */
+		private var enemy:Enemy;
 		
 		/** Time calculation for animation. */
 		private var elapsed:Number;
@@ -70,8 +78,7 @@ package states
 		/** Buffer */
 		private var timeshifter:TimeShifter;
 		private var _camera:ACitrusCamera;
-		private var _bounds:Rectangle;
-		
+		private var _bounds:Rectangle;		
 		
 		/** Constrains the gameArea */		
 		// Em altura é necessário saber onde o jogador está para a "regra 3 simples"
@@ -86,27 +93,27 @@ package states
 		// Margem do lado direito
 		private var _ladoDir:Number;
 		private var _ladoDirOffset:Number;	
-		
-		private var bq:NVquad;
-		private var _quadWidth:int;
-		private var _quadHeight:int;
-		private var _quadTopLeft:int;
-		private var _quadTopRight:int;
 
 		// ------------------------------------------------------------------------------------------------------------
 		// METHODS
 		// ------------------------------------------------------------------------------------------------------------
-		private var myQuad:CitrusSprite;
+		
 		private var _top:Rectangle;
 		private var _bottom:Rectangle;
-		private var rectangle:Shape;
+		
+		// Dragon Bones
+		[Embed(source="assets/texture.png",mimeType="application/octet-stream")]
+		private static const ResourcesData:Class;
+		
+		
 		public function InGame()
 		{
 			super();
-			
+		
 			// Is hardware rendering?
 			isHardwareRendering = Starling.context.driverInfo.toLowerCase().indexOf("software") == -1;
 		}
+		
 		
 		override public function initialize():void {
 			
@@ -120,43 +127,14 @@ package states
 			CitrusEngine.getInstance().input.keyboard.addKeyAction("right", Keyboard.RIGHT);
 			CitrusEngine.getInstance().input.keyboard.addKeyAction("down", Keyboard.DOWN);
 			CitrusEngine.getInstance().input.keyboard.addKeyAction("up", Keyboard.UP);
-
 			
 			// Define game area.
-			_top 		= new Rectangle(400, 200, 600, 20);
-			_bottom  	= new Rectangle(200, 450, 1000, 20);
+			_top 		= new Rectangle(100, 200, 1600, 20);
+			_bottom  	= new Rectangle(0, 450, 1600, 20);
 			_alturaY 	= _bottom.y - _top.y;
 			_ladoEsq 	= _top.x - _bottom.x;
 			_ladoDir 	= (_bottom.x + _bottom.width) - (_top.x + _top.width) ; 
-			
-			
-			rectangle = new Shape; // initializing the variable named rectangle
-			rectangle.graphics.beginFill(0xFF0000); // choosing the colour for the fill, here it is red
-			rectangle.graphics.drawRect(50, 450, 900,20); // (x spacing, y spacing, width, height)
-			rectangle.graphics.endFill(); // not always needed but I like to put it in to end the fill
-			addChild(rectangle); // adds the rectangle to the stage
-			
-			
-			// Define game area with a custom quad
-			//_quadWidth = 1600;
-			//_quadHeight = 294;
-			//_quadTopLeft = 254;
-			//_quadTopRight = 1346;
-			
-			//bq = new NVquad(_quadWidth, _quadHeight, _quadTopLeft, _quadTopRight, 0xE5E5E5);
-			//gameArea = bq.getBounds(bq);
-			//draw the quad
-			//myQuad = new CitrusSprite("quad", { x: 0, y: 180, width: 1600, height: 294, view: bq } )
-			//add(myQuad);
-			//add(new CitrusSprite("background", { x: 0, y: 180, width: 1600, height: 294, view: bq } ));
-			//_alturaY 			= (myQuad.y + myQuad.height) - myQuad.y; // constrains player in height
-			// LATERAL ESQUERDA
-			//_ladoEsq			= _quadTopLeft - myQuad.x;  //
-			// LATERAL DIREITA
-			//_ladoDir			= (myQuad.x + myQuad.width) - (_quadTopRight) ;  // pode ser colocado no inicio
-			
-
-						
+				
 			// Reset hit, camera shake and player speed.
 			getHit = 0;
 			cameraShake = 0;
@@ -165,7 +143,7 @@ package states
 			// Hero's initial position
 			hero.x = stage.stageWidth/2;
 			hero.y = stage.stageHeight/2;
-			
+				
 			// Reset game paused states.
 			gamePaused = false;
 			bg.gamePaused = false;
@@ -182,8 +160,7 @@ package states
 		
 		private function drawHUD():void
 		{
-			// TODO Auto Generated method stub
-			
+			// TODO Auto Generated method stub			
 		}
 		
 		private function drawGame():void
@@ -195,10 +172,18 @@ package states
 			// Draw hero.
 			hero = new Hero("hero", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
 			add(hero);
+			
+			// Draw hero.
+			enemy = new Enemy("enemy", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
+			add(enemy);
+			
+			var dragonbones:DBStarlingMultiBehavior = new DBStarlingMultiBehavior();
+			add(dragonbones as CitrusSprite);
+			
 		
-			
-			
-			
+			// Enemy's initial position
+			enemy.x = stage.stageWidth-200;
+			enemy.y= stage.stageHeight/2;
 		}
 		
 		private function shakeAnimation(event:Event):void
@@ -229,20 +214,17 @@ package states
 			bg.update(timeDelta);
 
 			bg.speed = 0;
-			hero.view.scaleX = hero.view.scaleY = (_alturaYAtualPerc * 0.01); 
-			
-			trace("_alturaYAtualPerc" + _alturaYAtualPerc);
-			trace("_alturaYAtual" + _alturaYAtual);
-						
-			// Confine the hero to stage area limit
-			
+			//hero.view.scaleX = hero.view.scaleY = (_alturaYAtualPerc * 0.01); 
+								
+			// Confine the hero to stage area limit			
 			// Height
-			_alturaYAtual 		= (hero.y + hero.height >> 1 ) - (_top.y); // verificar a altura do quad
+			_alturaYAtual 		= (hero.y - hero.height >> 1 ) - (_top.y); // verificar a altura do rect
 			_alturaYAtualPerc 	= (_alturaYAtual * 100)/_alturaY + 80;
 			
 			// Left side
 			_ladoEsqOffset		=(_ladoEsq*_alturaYAtualPerc) / 100;
 			_ladoEsqOffset		= -(_ladoEsqOffset-100);
+			
 			// Right side
 			_ladoDirOffset		=(_ladoDir*_alturaYAtualPerc) / 100;
 			_ladoDirOffset		= -(_ladoDirOffset-100);
@@ -322,38 +304,21 @@ package states
 				
 			}
 
-			/*			
-			if (hero.y > gameArea.bottom - hero.height * 0.5)    
-			{
-				hero.y = gameArea.bottom - hero.height * 0.5;				
-			}
-			if (hero.y < gameArea.top + hero.height * 0.5)    
-			{
-				hero.y = gameArea.top + hero.height * 0.5;
-			}
-			if (hero.x < gameArea.left + hero.width * 0.5)    
-			{
-				bg.speed = 0;
-				hero.x = gameArea.left + hero.width * 0.5;
-			}
-			if (hero.x > gameArea.right + hero.width * 0.5)    
-			{
-				bg.speed = 0;
-				hero.x = gameArea.right + hero.width * 0.5;
-			}
-			*/
-			trace("hero.y" + hero.y);
-			trace("hero.x" + hero.x);
+
+			//trace("hero.y" + hero.y);
+			//trace("hero.x" + hero.x);
 			//trace("_bottom.x" + _bottom.x);
 			//trace("_bottom.y" + _bottom.y);
 			//trace("_bottom.width" + _bottom.width);
 			//trace("_bottom.height" + _bottom.height);
-			trace("_top.y" + _top.y);
+			//trace("_top.y" + _top.y);
 			//trace("_top.x" + _top.x);
 			//("_top.width" + _top.width);
 			//trace("_top.height" + _top.height);
 			//trace("OffsetEsq" + _ladoEsqOffset);
-			//trace("OffsetDir" + _ladoDirOffset);	
+			//trace("OffsetDir" + _ladoDirOffset);
+			//trace("_alturaYAtualPerc" + _alturaYAtualPerc);
+			//trace("_alturaYAtual" + _alturaYAtual);
 	
 		}
 	}
