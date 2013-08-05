@@ -22,9 +22,8 @@ package states
 	
 	import starling.core.Starling;
 	import starling.display.MovieClip;
-	import starling.display.Sprite;
-	import starling.events.Event;
-	import starling.text.TextField;
+		import starling.events.Event;
+	
 		
 
 	public class InGame extends StarlingState
@@ -172,13 +171,14 @@ package states
 			// Draw hero.
 			hero = new Hero("hero", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
 			add(hero);
+			hero.view.scaleX = hero.view.scaleY = 0.8;
 			
 			// Draw hero.
 			enemy = new Enemy("enemy", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
 			add(enemy);
 			
-			var dragonbones:DBStarlingMultiBehavior = new DBStarlingMultiBehavior();
-			add(dragonbones as CitrusSprite);
+			//var dragonbones:DBStarlingMultiBehavior = new DBStarlingMultiBehavior();
+			//add(dragonbones as CitrusSprite);
 			
 		
 			// Enemy's initial position
@@ -214,7 +214,7 @@ package states
 			bg.update(timeDelta);
 
 			bg.speed = 0;
-			//hero.view.scaleX = hero.view.scaleY = (_alturaYAtualPerc * 0.01); 
+			//hero.view.scaleX = hero.view.scaleY = (_alturaYAtualPerc * 0.02); 
 								
 			// Confine the hero to stage area limit			
 			// Height
