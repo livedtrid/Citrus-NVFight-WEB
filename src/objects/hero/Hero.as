@@ -36,8 +36,8 @@ package objects.hero {
 			{
 				/** Hero character animation. */
 				
-				offsetX = Math.ceil(-_view.width/2);
-				offsetY = Math.ceil(-_view.height/2);
+				//offsetX = Math.ceil(-_view.width/2);
+				//offsetY = Math.ceil(-_view.height/2);
 			}
 			
 			/**
