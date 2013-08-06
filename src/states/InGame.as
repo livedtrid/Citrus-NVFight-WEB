@@ -7,7 +7,6 @@ package states
 	import citrus.core.starling.StarlingState;
 	import citrus.input.controllers.Keyboard;
 	import citrus.input.controllers.TimeShifter;
-	import citrus.objects.CitrusSprite;
 	import citrus.view.ACitrusCamera;
 	import citrus.view.starlingview.StarlingCamera;
 	
@@ -22,7 +21,8 @@ package states
 	
 	import starling.core.Starling;
 	import starling.display.MovieClip;
-		import starling.events.Event;
+	import starling.display.Sprite;
+	import starling.events.Event;
 	
 		
 
@@ -102,7 +102,9 @@ package states
 		
 		// Dragon Bones
 		[Embed(source="assets/texture.png",mimeType="application/octet-stream")]
-		private static const ResourcesData:Class;
+		private const _ResourcesData:Class;		
+		private var _factory:StarlingFactory;
+		private var _armature:Armature;
 		
 		
 		public function InGame()
@@ -117,6 +119,11 @@ package states
 		override public function initialize():void {
 			
 			super.initialize();
+			
+			//Dragonbones
+			//_factory = new StarlingFactory();
+			//_factory.addEventListener(Event.COMPLETE, _textureCompleteHandler);
+			//_factory.parseData(new _ResourcesData());
 			
 			drawGame();
 			drawHUD();
@@ -157,6 +164,21 @@ package states
 			//_camera.boundsMode = ACitrusCamera.BOUNDS_MODE_AABB;
 		}
 		
+		//Draonbones
+		private function _textureCompleteHandler(evt:Event):void {
+			
+			_factory.removeEventListener(Event.COMPLETE, _textureCompleteHandler);
+			
+			_armature = _factory.buildArmature("teo");
+			
+			(_armature.display as Sprite).scaleY = 0.5;
+			// the character is build on the left
+			(_armature.display as Sprite).scaleX = -0.5;
+			
+
+			
+		}
+		
 		private function drawHUD():void
 		{
 			// TODO Auto Generated method stub			
@@ -176,6 +198,10 @@ package states
 			// Draw hero.
 			enemy = new Enemy("enemy", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
 			add(enemy);
+			
+			//the design wasn't made on the center registration point but close to the top left.
+			//var dragon:Hero = new Hero("teo", {x:150, width:60, height:135, offsetY:135 / 2, view:_armature, registration:"topLeft"});
+			//add(dragon);
 			
 			//var dragonbones:DBStarlingMultiBehavior = new DBStarlingMultiBehavior();
 			//add(dragonbones as CitrusSprite);
@@ -303,8 +329,6 @@ package states
 				}
 				
 			}
-
-
 			//trace("hero.y" + hero.y);
 			//trace("hero.x" + hero.x);
 			//trace("_bottom.x" + _bottom.x);
@@ -322,4 +346,6 @@ package states
 	
 		}
 	}
+	
+
 }
