@@ -1,34 +1,30 @@
 package states
 {
+	import flash.events.Event;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
-	import dragonBones.animation.WorldClock;
 	
 	import citrus.core.CitrusEngine;
 	import citrus.core.starling.StarlingState;
 	import citrus.input.controllers.Keyboard;
 	import citrus.input.controllers.TimeShifter;
+	import citrus.objects.CitrusSprite;
 	import citrus.view.ACitrusCamera;
 	import citrus.view.starlingview.StarlingCamera;
 	
 	import core.Assets;
 	
 	import dragonBones.Armature;
+	import dragonBones.animation.WorldClock;
 	import dragonBones.factorys.StarlingFactory;
 	
-	//import objects.hero.Hero;
-	import citrus.objects.platformer.box2d.Hero;
-	import citrus.physics.box2d.Box2D;
+	import objects.hero.Hero;
 	import objects.objects.Enemy;
 	import objects.objects.GameBackground;
 	
 	import starling.core.Starling;
 	import starling.display.MovieClip;
 	import starling.display.Sprite;
-	
-	import flash.events.Event;
-	
-	
 
 	public class InGame extends StarlingState
 	{
@@ -70,7 +66,8 @@ package states
 		private var gameState:int;
 		
 		/** Player's speed. */
-		private var playerSpeed:Number;
+		private var speedX:Number;
+		private var speedY:Number;
 		
 		/** The power of obstacle after it is hit. */
 		private var getHit:Number = 0;
@@ -83,7 +80,6 @@ package states
 		private var _camera:ACitrusCamera;
 		private var _bounds:Rectangle;		
 		
-		/** Constrains the gameArea */		
 		// Em altura é necessário saber onde o jogador está para a "regra 3 simples"
 		private var _alturaY:Number;
 		private var _alturaYAtual:Number;
@@ -111,6 +107,15 @@ package states
 		private var _armature:Armature;
 		private var dragon:Hero;// Substitui o hero depois quando ficar a funcionar
 		private var isRight:Boolean;
+		private var isDown:Boolean;
+		private var isUp:Boolean;
+		private var isLeft:Boolean;
+		
+		private var moveDirX:int;
+		private var moveDirY:int;
+		private var _armatureClip:Sprite;
+		private var dirX:int;
+		
 		
 		
 		public function InGame()
@@ -122,14 +127,30 @@ package states
 		}
 		
 		
+		/** Constrains the gameArea */
+		public function get alturaY():Number
+		{
+			return _alturaY;
+		}
+
+		/**
+		 * @private
+		 */
+		public function set alturaY(value:Number):void
+		{
+			_alturaY = value;
+		}
+
 		override public function initialize():void {
 			
-			super.initialize();
-			//teste
-			var box2D:Box2D = new Box2D("box2D");
-			// box2D.visible = true;
-			add(box2D);
-			box2D.gravity.y=box2D.gravity.x=0;
+			super.initialize();	
+			
+			moveDirX=0;
+			moveDirY=0;
+			
+			speedX=0;
+			speedY=0;
+			
 			
 			//Dragonbones
 			_factory = new StarlingFactory();
@@ -155,20 +176,20 @@ package states
 			// Reset hit, camera shake and player speed.
 			getHit = 0;
 			cameraShake = 0;
-			playerSpeed = 0.8;
+			speedX = 0.8;
 			
 			// Hero's initial position
 	
 			hero.x = stage.stageWidth/2;
 			hero.y = stage.stageHeight/2;
 			
-					// Reset game paused states.
+			// Reset game paused states.
 			gamePaused = false;
 			bg.gamePaused = false;
 			
 			_bounds = new Rectangle(0, 0, 1600, 480); //camera boundaries
 			_camera = view.camera as StarlingCamera;
-			_camera.setUp(hero, new Point(stage.stageWidth / 2, stage.stageHeight / 2), _bounds, new Point(0.05, 0.05));
+			//_camera.setUp(hero, new Point(stage.stageWidth / 2, stage.stageHeight / 2), _bounds, new Point(0.05, 0.05));
 			//_camera.allowRotation = true;
 			_camera.allowZoom = true;
 			
@@ -184,10 +205,11 @@ package states
 			_factory.removeEventListener(Event.COMPLETE, _textureCompleteHandler);
 			
 			_armature = _factory.buildArmature("teo");
+			_armatureClip = _armature.display as Sprite;
 			
-			(_armature.display as Sprite).scaleY = 0.5;
-			// the character is build on the left
-			(_armature.display as Sprite).scaleX = -0.5;
+			_armatureClip.scaleY = 1;
+			// if want the character to be build on the left this value need to be negative
+			_armatureClip.scaleX = 1;
 			
 			//the design wasn't made on the center registration point but close to the top left.
 			dragon= new Hero("teo", {x:150, width:60, height:135, offsetY:135 / 2, view:_armature, registration:"topLeft"});
@@ -195,18 +217,17 @@ package states
 			// dragon's initial position
 			dragon.x = stage.stageWidth-100;
 			dragon.y= stage.stageHeight/2;
+			_armature.animation.gotoAndPlay("walking", -1, -1, true);
 			
 			
 			add(dragon);
+			_camera.setUp(dragon, new Point(stage.stageWidth / 2, stage.stageHeight / 2), _bounds, new Point(0.05, 0.05));
+			//_camera.allowRotation = true;
 			
 			WorldClock.clock.add(_armature);
 			
 
 			
-		}
-		
-		private function updateBehavior():void 
-		{
 		}
 		
 		private function drawHUD():void
@@ -222,12 +243,12 @@ package states
 			
 			// Draw hero.
 			hero = new Hero("hero", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
-			add(hero);
+			//add(hero);
 			hero.view.scaleX = hero.view.scaleY = 0.8;
 			
 			// Draw hero.
 			enemy = new Enemy("enemy", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
-			add(enemy);
+			//add(enemy);
 				
 			// Enemy's initial position
 			enemy.x = stage.stageWidth-200;
@@ -260,15 +281,21 @@ package states
 		override public function update(timeDelta:Number):void {
 			super.update(timeDelta);
 			
+			isDown=  CitrusEngine.getInstance().input.("down");
+			isUp= CitrusEngine.getInstance().input.isDoing("up");
+			isLeft=  CitrusEngine.getInstance().input.isDoing("left");
+			isRight= CitrusEngine.getInstance().input.isDoing("right");
+			
+			//call worldClock to animate armature
 			WorldClock.clock.advanceTime(-1);
 			
+			//how much time has passed
 			elapsed = timeDelta;
 			
+			//Update background animation
 			bg.update(timeDelta);
-
 			bg.speed = 0;
-			//hero.view.scaleX = hero.view.scaleY = (_alturaYAtualPerc * 0.02); 
-								
+											
 			// Confine the hero to stage area limit			
 			// Height
 			_alturaYAtual 		= (hero.y - hero.height >> 1 ) - (_top.y); // verificar a altura do rect
@@ -281,100 +308,64 @@ package states
 			// Right side
 			_ladoDirOffset		=(_ladoDir*_alturaYAtualPerc) / 100;
 			_ladoDirOffset		= -(_ladoDirOffset-100);
-						
-			if (CitrusEngine.getInstance().input.isDoing("left"))
-			{					
-				if ((hero.x + 5)  >= (_bottom.x + (hero.width/2)  ) + _ladoEsqOffset ){
-				//	hero.x -= 5 * playerSpeed; // move the player to the left
-					//dragon.x -= 5 * playerSpeed; // move the player to the left
-					_armature.animation.gotoAndPlay("walking", -1,-1,true);	
-														
-					//// stop background
-					if (hero.x <= 400 || hero.x >= 1200)
-					{
-						bg.speed = 0; // stop background
-					}else{
-						bg.speed = playerSpeed * elapsed * -1; //move background to the right
-					}
-					
-				}else{
-					//hero.x -= 0; // stop player
-					bg.speed = 0; // stop background
-					_armature.animation.gotoAndPlay("stand", -1,-1,true);
-				}				
-				//if(hero.inverted == false)
-				//hero.inverted=true;
-			}
 			
-			if (CitrusEngine.getInstance().input.isDoing("right"))
-			{									
-				if ((hero.x + 5) <= (_bottom.x + _bottom.width + (hero.width/2)) - _ladoDirOffset){
-					
-					//hero.x += 5 * playerSpeed; // move the player to the right
-					//dragon.x += 5 * playerSpeed; // move the player to the left
-					_armature.animation.gotoAndPlay("walking", -1,-1,true);	
-															
-					//// stop background
-					if (hero.x <= 500 || hero.x >= 1100)
-					{
-						bg.speed = 0; // stop background
-					}else{
-						bg.speed = playerSpeed * elapsed; //move background to the left
-					}
-					
-				}else{
-					//hero.x += 0; // stop player
-					//dragon.x +=0; // 
-					hero.acceleration=0;
-					dragon.acceleration=0;
-					_armature.animation.gotoAndPlay("stand", -1,-1,true);	
-					bg.speed = 0; // stop background
-				}				
-				//if(hero.inverted)
-					//hero.inverted=false;
-				}
-			
-			if (CitrusEngine.getInstance().input.isDoing("up"))
+			if (isLeft && isRight) 
 			{
-				// Dont get stuck on wall when walking up on the right side
-				if ((hero.x + 5) >= (_bottom.x + _bottom.width + (hero.width/2) ) - _ladoDirOffset){
-					hero.x -= 5;
-					bg.speed = 0; // stop background need to be fixed
-				}
-				
-				// Dont get stuck on wall when walking up on the left side
-				if ((hero.x + 5)  <= (_bottom.x + (hero.width/2)  ) + _ladoEsqOffset ){
-					hero.x += 5;
-					bg.speed = 0; // stop background need to be fixed
-				}				
-					if((hero.y + 5) >= _top.y ){
-					hero.y -= 5 * playerSpeed;
-					dragon.y -= 5 * playerSpeed;
-					_armature.animation.gotoAndPlay("walking", -1,-1,true);	
-					
-				}else{
-					hero.y-=0;
-					dragon.y-=0;
-					hero.acceleration=0;
-					dragon.acceleration=0;
-					_armature.animation.gotoAndPlay("stand", -1,-1,true);				
-				}				
+				dirX=moveDirX;
+				return;
+			}
+			else if (isLeft)
+			{
+				dirX=-1;
+			}
+			else if (isRight)
+			{
+				dirX=1;
+			}
+			else 
+			{
+				dirX=0;
+			}
+			if(dirX==moveDirX)
+			{
+				return;
+			}
+			else
+			{
+				moveDirX=dirX;
 			}
 			
-			if (CitrusEngine.getInstance().input.isDoing("down"))
-			{					
-				if((hero.y + (hero.height >> 1) + 5) <= (_bottom.y)){
-					hero.y += 5 * playerSpeed;
-					dragon.y += 5 * playerSpeed;
-					_armature.animation.gotoAndPlay("walking");
-				}else{
-					hero.y +=0;
-					dragon.y +=0;
-					hero.acceleration=0;
-					dragon.acceleration=0;
-					_armature.animation.gotoAndPlay("stand");
-				}
+			/*
+			if (isUp && isDown) 
+			{
+				dirY=moveDirX;
+				return;
 			}
+			else if (isUp)
+			{
+				dirY=-1;
+			}
+			else if (isDown)
+			{
+				dirY=1;
+			}
+			else 
+			{
+				dirY=0;
+			}
+			if(dirY==moveDirY)
+			{
+				return;
+			}
+			else
+			{
+				moveDirY=dirY;
+			}
+			*/
+			
+			updateBehavior();
+			updateMove();
+			
 			//trace("hero.y" + hero.y);
 			//trace("hero.x" + hero.x);
 			//trace("_bottom.x" + _bottom.x);
@@ -389,6 +380,45 @@ package states
 			//trace("OffsetDir" + _ladoDirOffset);
 			//trace("_alturaYAtualPerc" + _alturaYAtualPerc);
 			//trace("_alturaYAtual" + _alturaYAtual);	
+		}
+		
+		private function updateMove():void
+		{
+			if (speedX != 0) 
+			{
+				dragon.x += 5;
+				//speedX=5*moveDirX;
+				//_armatureClip.scaleX = moveDirX;			
+			}
+			
+			if (speedY != 0) 
+			{
+				dragon.y += speedY;
+				speedY=5*moveDirY;
+			}
+			
+			
+		}
+		
+		private function updateBehavior():void 
+		{
+			/*
+			if (isJumping)
+			{
+			return;
+			}
+			if (moveDirX == 0 && moveDirY == 0)
+			{
+				speedX = 0;
+				_armature.animation.gotoAndPlay("stand");
+			}
+			else
+			{
+				speedX=5*moveDirX;
+				_armatureClip.scaleX = -moveDirX;
+				_armature.animation.gotoAndPlay("walking");
+			}
+			*/
 		}
 	}
 }

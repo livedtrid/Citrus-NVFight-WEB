@@ -65,6 +65,8 @@ package objects.hero {
 				//camTarget.x = _body.position.x;
 				//camTarget.y = _body.position.y;
 				
+				
+				
 			}
 		}
 	}
