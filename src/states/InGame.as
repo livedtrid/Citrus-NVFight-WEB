@@ -16,7 +16,9 @@ package states
 	import dragonBones.Armature;
 	import dragonBones.factorys.StarlingFactory;
 	
-	import objects.hero.Hero;
+	//import objects.hero.Hero;
+	import citrus.objects.platformer.box2d.Hero;
+	import citrus.physics.box2d.Box2D;
 	import objects.objects.Enemy;
 	import objects.objects.GameBackground;
 	
@@ -123,6 +125,11 @@ package states
 		override public function initialize():void {
 			
 			super.initialize();
+			//teste
+			var box2D:Box2D = new Box2D("box2D");
+			// box2D.visible = true;
+			add(box2D);
+			box2D.gravity.y=box2D.gravity.x=0;
 			
 			//Dragonbones
 			_factory = new StarlingFactory();
@@ -155,7 +162,7 @@ package states
 			hero.x = stage.stageWidth/2;
 			hero.y = stage.stageHeight/2;
 			
-			// Reset game paused states.
+					// Reset game paused states.
 			gamePaused = false;
 			bg.gamePaused = false;
 			
@@ -276,11 +283,11 @@ package states
 			_ladoDirOffset		= -(_ladoDirOffset-100);
 						
 			if (CitrusEngine.getInstance().input.isDoing("left"))
-			{			
-				
+			{					
 				if ((hero.x + 5)  >= (_bottom.x + (hero.width/2)  ) + _ladoEsqOffset ){
-					hero.x -= 5 * playerSpeed; // move the player to the left
-					dragon.x -= 5 * playerSpeed; // move the player to the left
+				//	hero.x -= 5 * playerSpeed; // move the player to the left
+					//dragon.x -= 5 * playerSpeed; // move the player to the left
+					_armature.animation.gotoAndPlay("walking", -1,-1,true);	
 														
 					//// stop background
 					if (hero.x <= 400 || hero.x >= 1200)
@@ -291,21 +298,21 @@ package states
 					}
 					
 				}else{
-					hero.x -= 0; // stop player
+					//hero.x -= 0; // stop player
 					bg.speed = 0; // stop background
+					_armature.animation.gotoAndPlay("stand", -1,-1,true);
 				}				
-				if(hero.inverted == false)
-				hero.inverted=true;
+				//if(hero.inverted == false)
+				//hero.inverted=true;
 			}
 			
 			if (CitrusEngine.getInstance().input.isDoing("right"))
-			{					
-				isRight=true;
-				
+			{									
 				if ((hero.x + 5) <= (_bottom.x + _bottom.width + (hero.width/2)) - _ladoDirOffset){
-					hero.x += 5 * playerSpeed; // move the player to the right
-					dragon.x += 5 * playerSpeed; // move the player to the left
-					_armature.animation.gotoAndPlay("walking");
+					
+					//hero.x += 5 * playerSpeed; // move the player to the right
+					//dragon.x += 5 * playerSpeed; // move the player to the left
+					_armature.animation.gotoAndPlay("walking", -1,-1,true);	
 															
 					//// stop background
 					if (hero.x <= 500 || hero.x >= 1100)
@@ -316,14 +323,16 @@ package states
 					}
 					
 				}else{
-					hero.x += 0; // stop player
-					dragon.x +=0; // 
-					_armature.animation.gotoAndPlay("stand");
+					//hero.x += 0; // stop player
+					//dragon.x +=0; // 
+					hero.acceleration=0;
+					dragon.acceleration=0;
+					_armature.animation.gotoAndPlay("stand", -1,-1,true);	
 					bg.speed = 0; // stop background
 				}				
-				if(hero.inverted == true)
-					hero.inverted=false;
-			}
+				//if(hero.inverted)
+					//hero.inverted=false;
+				}
 			
 			if (CitrusEngine.getInstance().input.isDoing("up"))
 			{
@@ -332,7 +341,7 @@ package states
 					hero.x -= 5;
 					bg.speed = 0; // stop background need to be fixed
 				}
-
+				
 				// Dont get stuck on wall when walking up on the left side
 				if ((hero.x + 5)  <= (_bottom.x + (hero.width/2)  ) + _ladoEsqOffset ){
 					hero.x += 5;
@@ -341,13 +350,17 @@ package states
 					if((hero.y + 5) >= _top.y ){
 					hero.y -= 5 * playerSpeed;
 					dragon.y -= 5 * playerSpeed;
+					_armature.animation.gotoAndPlay("walking", -1,-1,true);	
 					
 				}else{
 					hero.y-=0;
 					dragon.y-=0;
+					hero.acceleration=0;
+					dragon.acceleration=0;
 					_armature.animation.gotoAndPlay("stand", -1,-1,true);				
 				}				
 			}
+			
 			if (CitrusEngine.getInstance().input.isDoing("down"))
 			{					
 				if((hero.y + (hero.height >> 1) + 5) <= (_bottom.y)){
@@ -357,13 +370,10 @@ package states
 				}else{
 					hero.y +=0;
 					dragon.y +=0;
+					hero.acceleration=0;
+					dragon.acceleration=0;
 					_armature.animation.gotoAndPlay("stand");
 				}
-				
-				if(isRight)
-					{
-						_armature.animation.gotoAndPlay("walking");
-					}
 			}
 			//trace("hero.y" + hero.y);
 			//trace("hero.x" + hero.x);
