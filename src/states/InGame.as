@@ -8,7 +8,6 @@ package states
 	import citrus.core.starling.StarlingState;
 	import citrus.input.controllers.Keyboard;
 	import citrus.input.controllers.TimeShifter;
-	import citrus.objects.CitrusSprite;
 	import citrus.view.ACitrusCamera;
 	import citrus.view.starlingview.StarlingCamera;
 	
@@ -116,14 +115,15 @@ package states
 		private var _armatureClip:Sprite;
 		private var dirX:int;
 		private var dirY:int;
+		private var heroScale:Number;
 		
 		
 		
 		public function InGame()
 		{
 			super();
-		
-			// Is hardware rendering?
+			
+		// Is hardware rendering?
 			isHardwareRendering = Starling.context.driverInfo.toLowerCase().indexOf("software") == -1;
 		}
 		
@@ -146,27 +146,28 @@ package states
 			
 			super.initialize();	
 			
+			//Dragonbones
+			_factory = new StarlingFactory();
+			_factory.addEventListener(Event.COMPLETE, _textureCompleteHandler);
+			_factory.parseData(new _ResourcesData());
+			
 			moveDirX=0;
 			moveDirY=0;
 			
 			speedX=0.8;
 			speedY=0.8;
 			
-			
-			//Dragonbones
-			_factory = new StarlingFactory();
-			_factory.addEventListener(Event.COMPLETE, _textureCompleteHandler);
-			_factory.parseData(new _ResourcesData());
-			
-			drawGame();
-			drawHUD();
+			//Defines the hero scale
+			heroScale=0.7;
 			
 			// Define keyboard interactions - moved to the Hero class
 			CitrusEngine.getInstance().input.keyboard.addKeyAction("left", Keyboard.LEFT);
 			CitrusEngine.getInstance().input.keyboard.addKeyAction("right", Keyboard.RIGHT);
 			CitrusEngine.getInstance().input.keyboard.addKeyAction("down", Keyboard.DOWN);
 			CitrusEngine.getInstance().input.keyboard.addKeyAction("up", Keyboard.UP);
-			
+			CitrusEngine.getInstance().input.keyboard.addKeyAction("kick", Keyboard.Z);
+			CitrusEngine.getInstance().input.keyboard.addKeyAction("punch", Keyboard.X);
+				
 			// Define game area.
 			_top 		= new Rectangle(100, 200, 1600, 20);
 			_bottom  	= new Rectangle(0, 450, 1600, 20);
@@ -178,16 +179,6 @@ package states
 			getHit = 0;
 			cameraShake = 0;
 			
-			
-			// Hero's initial position
-	
-			hero.x = stage.stageWidth/2;
-			hero.y = stage.stageHeight/2;
-			
-			// Reset game paused states.
-			gamePaused = false;
-			bg.gamePaused = false;
-			
 			_bounds = new Rectangle(0, 0, 1600, 480); //camera boundaries
 			_camera = view.camera as StarlingCamera;
 			//_camera.setUp(hero, new Point(stage.stageWidth / 2, stage.stageHeight / 2), _bounds, new Point(0.05, 0.05));
@@ -197,7 +188,12 @@ package states
 			//_camera.parallaxMode = ACitrusCamera.PARALLAX_MODE_TOPLEFT;
 			//_camera.boundsMode = ACitrusCamera.BOUNDS_MODE_AABB;
 			
+			drawGame();
+			drawHUD();
 			
+			// Reset game paused states.
+			gamePaused = false;
+			bg.gamePaused = false;
 		}
 		
 		//Draonbones
@@ -206,14 +202,18 @@ package states
 			_factory.removeEventListener(Event.COMPLETE, _textureCompleteHandler);
 			
 			_armature = _factory.buildArmature("teo");
+			
 			_armatureClip = _armature.display as Sprite;
+			_armatureClip.x = stage.stageWidth >> 1;
+			_armatureClip.y = stage.stageHeight >> 1;
+			_armatureClip.pivotX = _armatureClip.width >> 1;
 			
-			_armatureClip.scaleY = 1;
+			
 			// if want the character to be build on the left this value need to be negative
-			_armatureClip.scaleX = 1;
-			
+		
+			_armatureClip.scaleY = _armatureClip.scaleX = heroScale;
 			//the design wasn't made on the center registration point but close to the top left.
-			dragon= new Hero("teo", {x:150, width:60, height:135, offsetY:135 / 2, view:_armature, registration:"topLeft"});
+			dragon = new Hero("teo", {x:0, width:0, height:0, offsetY:0 / 2, view:_armatureClip, registration:"topLeft"});
 			
 			// dragon's initial position
 			dragon.x = stage.stageWidth-100;
@@ -244,8 +244,11 @@ package states
 			
 			// Draw hero.
 			hero = new Hero("hero", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
+			// Hero's initial position	
+			hero.x = stage.stageWidth/2;
+			hero.y = stage.stageHeight/2;
 			//add(hero);
-			hero.view.scaleX = hero.view.scaleY = 0.8;
+			hero.view.scaleX = hero.view.scaleY = heroScale;
 			
 			// Draw hero.
 			enemy = new Enemy("enemy", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
@@ -282,6 +285,18 @@ package states
 		override public function update(timeDelta:Number):void {
 			super.update(timeDelta);
 			
+			
+			
+			/* 
+			__________.__                                                  .__        __   
+			\______   \  | _____  ___.__. ___________    ______ ___________|__|______/  |_ 
+			|     ___/  | \__  \<   |  |/ __ \_  __ \  /  ___// ___\_  __ \  \____ \   __\
+			|    |   |  |__/ __ \\___  \  ___/|  | \/  \___ \\  \___|  | \/  |  |_> >  |  
+			|____|   |____(____  / ____|\___  >__|    /____  >\___  >__|  |__|   __/|__|  
+			\/\/         \/             \/     \/         |__|        
+			
+			*/
+			
 			isDown=  CitrusEngine.getInstance().input.isDoing("down");
 			isUp= CitrusEngine.getInstance().input.isDoing("up");
 			isLeft=  CitrusEngine.getInstance().input.isDoing("left");
@@ -312,18 +327,21 @@ package states
 			
 			if (isLeft && isRight|| isUp && isDown) 
 			{
-				dirX=moveDirX;
-				dirY=moveDirY;
+				//dirX=moveDirX;
+				//dirY=moveDirY;
 				return;
 			}
 			if (isLeft)
 			{
 				dragon.x -= 5 * speedX;
 				dirX=-1;
+				dragon.inverted = true;
 			}
 			if (isRight)
 			{
 				dragon.x+= 5 * speedX;
+				dragon.inverted = false;
+				
 				dirX=1;
 			}
 			if (isUp)
@@ -336,24 +354,18 @@ package states
 				dragon.y += 5 * speedY;
 				dirY=1;
 			}
-			else 
-			{
-				dirY=0;
-				dirX=0;
-			}
-			if(dirX==moveDirX||dirY==moveDirY)
-			{
-				return;
-			}
-			else
-			{
-				moveDirX=dirX;
-				moveDirY=dirY;
-			}
-		
-			updateBehavior();
-			updateMove();
 			
+			
+			if(CitrusEngine.getInstance().input.justDid("punch")){
+				punch();
+			}
+	
+			if(CitrusEngine.getInstance().input.justDid("kick")){
+				kick();
+			}
+			//updateBehavior();
+			updateMove();
+			trace("Kick = " + CitrusEngine.getInstance().input.justDid("kick"));
 			//trace("hero.y" + hero.y);
 			//trace("hero.x" + hero.x);
 			//trace("_bottom.x" + _bottom.x);
@@ -370,13 +382,32 @@ package states
 			//trace("_alturaYAtual" + _alturaYAtual);	
 		}
 		
+		private function kick():void
+		{
+			_armature.animation.gotoAndPlay("kick");
+		}
+		
+		//soco
+		private function punch():void
+		{
+
+			 _armature.animation.gotoAndPlay("right punch");
+			
+			
+			//_armature.animation.gotoAndPlay("left punch");
+		}
+		
 		private function updateMove():void
 		{
 
 		}
 		
+		
+		
 		private function updateBehavior():void 
 		{
+			
+			
 			/*
 			if (isJumping)
 			{
