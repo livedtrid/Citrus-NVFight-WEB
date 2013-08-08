@@ -115,6 +115,7 @@ package states
 		private var moveDirY:int;
 		private var _armatureClip:Sprite;
 		private var dirX:int;
+		private var dirY:int;
 		
 		
 		
@@ -148,8 +149,8 @@ package states
 			moveDirX=0;
 			moveDirY=0;
 			
-			speedX=0;
-			speedY=0;
+			speedX=0.8;
+			speedY=0.8;
 			
 			
 			//Dragonbones
@@ -176,7 +177,7 @@ package states
 			// Reset hit, camera shake and player speed.
 			getHit = 0;
 			cameraShake = 0;
-			speedX = 0.8;
+			
 			
 			// Hero's initial position
 	
@@ -281,7 +282,7 @@ package states
 		override public function update(timeDelta:Number):void {
 			super.update(timeDelta);
 			
-			isDown=  CitrusEngine.getInstance().input.("down");
+			isDown=  CitrusEngine.getInstance().input.isDoing("down");
 			isUp= CitrusEngine.getInstance().input.isDoing("up");
 			isLeft=  CitrusEngine.getInstance().input.isDoing("left");
 			isRight= CitrusEngine.getInstance().input.isDoing("right");
@@ -309,60 +310,47 @@ package states
 			_ladoDirOffset		=(_ladoDir*_alturaYAtualPerc) / 100;
 			_ladoDirOffset		= -(_ladoDirOffset-100);
 			
-			if (isLeft && isRight) 
+			if (isLeft && isRight|| isUp && isDown) 
 			{
 				dirX=moveDirX;
+				dirY=moveDirY;
 				return;
 			}
-			else if (isLeft)
+			if (isLeft)
 			{
+				dragon.x -= 5 * speedX;
 				dirX=-1;
 			}
-			else if (isRight)
+			if (isRight)
 			{
+				dragon.x+= 5 * speedX;
 				dirX=1;
+			}
+			if (isUp)
+			{
+				dragon.y -= 5 * speedY;
+				dirY=-1;
+			}
+			if (isDown)
+			{
+				dragon.y += 5 * speedY;
+				dirY=1;
 			}
 			else 
 			{
+				dirY=0;
 				dirX=0;
 			}
-			if(dirX==moveDirX)
+			if(dirX==moveDirX||dirY==moveDirY)
 			{
 				return;
 			}
 			else
 			{
 				moveDirX=dirX;
-			}
-			
-			/*
-			if (isUp && isDown) 
-			{
-				dirY=moveDirX;
-				return;
-			}
-			else if (isUp)
-			{
-				dirY=-1;
-			}
-			else if (isDown)
-			{
-				dirY=1;
-			}
-			else 
-			{
-				dirY=0;
-			}
-			if(dirY==moveDirY)
-			{
-				return;
-			}
-			else
-			{
 				moveDirY=dirY;
 			}
-			*/
-			
+		
 			updateBehavior();
 			updateMove();
 			
@@ -384,20 +372,7 @@ package states
 		
 		private function updateMove():void
 		{
-			if (speedX != 0) 
-			{
-				dragon.x += 5;
-				//speedX=5*moveDirX;
-				//_armatureClip.scaleX = moveDirX;			
-			}
-			
-			if (speedY != 0) 
-			{
-				dragon.y += speedY;
-				speedY=5*moveDirY;
-			}
-			
-			
+
 		}
 		
 		private function updateBehavior():void 
@@ -407,6 +382,8 @@ package states
 			{
 			return;
 			}
+			*/
+			
 			if (moveDirX == 0 && moveDirY == 0)
 			{
 				speedX = 0;
@@ -414,11 +391,10 @@ package states
 			}
 			else
 			{
-				speedX=5*moveDirX;
-				_armatureClip.scaleX = -moveDirX;
+				//_armatureClip.scaleX = -moveDirX;
 				_armature.animation.gotoAndPlay("walking");
 			}
-			*/
+		
 		}
 	}
 }
