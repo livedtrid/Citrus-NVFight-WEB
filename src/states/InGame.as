@@ -230,39 +230,121 @@ package states
 		
 		private function onKeyEventHandler(e:KeyboardEvent):void
 		{
-			isDown	= CitrusEngine.getInstance().input.isDoing("down");
-			isUp	= CitrusEngine.getInstance().input.isDoing("up");
-			isLeft	= CitrusEngine.getInstance().input.isDoing("left");
-			isRight	= CitrusEngine.getInstance().input.isDoing("right");
+			/*isDown	= CitrusEngine.getInstance().input.justDid("down");
+			isUp	= CitrusEngine.getInstance().input.justDid("up");
+			isLeft	= CitrusEngine.getInstance().input.justDid("left");
+			isRight	= CitrusEngine.getInstance().input.justDid("right");
+			*/
+			
+			switch (e.keyCode)
+			{
+				case Keyboard.A :
+				case Keyboard.LEFT :
+					isLeft=e.type == KeyboardEvent.KEY_DOWN;
+					break;
+				case Keyboard.D :
+				case Keyboard.RIGHT :
+					isRight=e.type == KeyboardEvent.KEY_DOWN;
+					break;
+				case Keyboard.S :
+				case Keyboard.DOWN :
+					isDown=e.type == KeyboardEvent.KEY_DOWN;
+					break;
+				case Keyboard.W :
+				case Keyboard.UP :
+					isUp=e.type == KeyboardEvent.KEY_DOWN;
+					break;
+				case Keyboard.X :
+					kick();
+					break;
+				case Keyboard.Z :
+					punch();
+					break;
+			}
 						
 			var dirX:int;
+			var dirY:int;
 			if (isLeft && isRight) 
 			{
 				dirX=moveDirX;
 				return;
 			}
+			else if (isUp && isDown)
+			{
+				dirY=moveDirY;
+				return;
+			}
 			else if (isLeft)
 			{
 				dirX=-1;
-
 			}
 			else if (isRight)
 			{
 				dirX=1;
+			}
 
-			}else
+			else if (isUp)
+			{
+				dirY=-1;
+			}
+			else if (isDown)
+			{
+				dirY=1;
+			}
+			else
 			{
 				dirX=0;
+				dirY=0;
 			}
-			if(dirX==moveDirX)
+			
+			trace("dirX==moveDirX ||dirY==moveDirY =" + dirX +moveDirX);
+			if(dirX==moveDirX ||dirY==moveDirY )
 			{
 				return;
 			}
 			else
 			{
 				moveDirX=dirX;
+				dirY=moveDirY;
 			}
+			trace("Pega no meu pau");
 			updateBehavior();
+		
+			/*
+			var dirY:int;
+			if (isUp && isDown) 
+			{
+				
+				dirY=moveDirY;
+				return;
+			}
+			else if (isUp)
+			{
+				
+				dirY=-1;
+			}
+			else if (isDown)
+			{
+				dirY=1;
+			}
+			else
+			{
+				
+				dirY=0;
+			}
+		
+			
+			if(dirY==moveDirY)
+			{
+				return;
+			}
+			else
+			{
+					moveDirY=dirY;
+			}
+			
+					
+			updateBehavior();*/
 			
 			//fazer trace ao moveDirX dirX no update behavior variavel nao esta retornando a 0
 		}
@@ -340,7 +422,6 @@ package states
 			|    |   |  |__/ __ \\___  \  ___/|  | \/  \___ \\  \___|  | \/  |  |_> >  |  
 			|____|   |____(____  / ____|\___  >__|    /____  >\___  >__|  |__|   __/|__|  
 			\/\/         \/             \/     \/         |__|        
-			
 			*/
 											
 			// Confine the hero to stage area limit			
@@ -362,20 +443,15 @@ package states
 	
 			if(CitrusEngine.getInstance().input.justDid("kick")){
 				kick();
-			}			
+			}		
+			
 
 			
+			trace("moveDirX" + moveDirX);
+			trace("speedX" + speedX);
 			
-		//trace("_bottom.x" + _bottom.x);
-			//trace("_bottom.y" + _bottom.y);
-			//trace("_bottom.width" + _bottom.width);
-			//trace("_bottom.height" + _bottom.height);
-			//trace("_top.y" + _top.y);
-			//trace("_top.x" + _top.x);
-			//("_top.width" + _top.width);
-			//trace("_top.height" + _top.height);
-			//trace("OffsetEsq" + _ladoEsqOffset);
-			//trace("OffsetDir" + _ladoDirOffset);
+			trace("speedY =" + speedY);
+			trace("moveDirY" + moveDirY);
 			//trace("_alturaYAtualPerc" + _alturaYAtualPerc);
 			//trace("_alturaYAtual" + _alturaYAtual);	
 		}
@@ -388,36 +464,41 @@ package states
 		//soco
 		private function punch():void
 		{
-
 			 _armature.animation.gotoAndPlay("right punch");
-			
-			
 			//_armature.animation.gotoAndPlay("left punch");
 		}
 		
 		private function updateMove():void
 		{
-			trace("speedX" + speedX);
+			
 			if(speedX !=0)
 			{
 				dragon.x += speedX;
+			}
+			
+			if(speedY !=0)
+			{
+				dragon.y += speedY;
 			}
 		}	
 		
 		private function updateBehavior():void 
 		{
-			//if (isFighting)
-			//{
+			if (isFighting)
+			{
 				//return;
-			//}
-			if (moveDirX == 0)
+			}
+			if (moveDirX == 0 && moveDirY == 0)
 			{
 				speedX = 0;
+				speedY = 0;
 				_armature.animation.gotoAndPlay("stand", -1, -1, true);
 			}
 			else
 			{
 				speedX=5*moveDirX;
+				speedY=5*moveDirY;
+				
 				_armature.animation.gotoAndPlay("walking", -1, -1, true);
 				if(isRight)
 					dragon.inverted = false;

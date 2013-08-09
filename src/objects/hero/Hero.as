@@ -1,6 +1,7 @@
 package objects.hero {
 		
-		import citrus.objects.CitrusSprite;
+		//import citrus.objects.CitrusSprite;
+		import citrus.objects.platformer.simple.Hero;
 		
 		//import games.hungryhero.GameConstants;
 		
@@ -10,7 +11,7 @@ package objects.hero {
 		 * @author hsharma
 		 * 
 		 */
-		public class Hero extends CitrusSprite
+		public class Hero extends citrus.objects.platformer.simple.Hero
 		{		
 			/** State of the hero. */
 			public var state:int;
