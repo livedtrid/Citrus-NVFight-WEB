@@ -24,6 +24,7 @@ package states
 	import starling.core.Starling;
 	import starling.display.MovieClip;
 	import starling.display.Sprite;
+	import starling.events.KeyboardEvent;
 
 	public class InGame extends StarlingState
 	{
@@ -109,13 +110,11 @@ package states
 		private var isDown:Boolean;
 		private var isUp:Boolean;
 		private var isLeft:Boolean;
-		
 		private var moveDirX:int;
 		private var moveDirY:int;
 		private var _armatureClip:Sprite;
-		private var dirX:int;
-		private var dirY:int;
 		private var heroScale:Number;
+		private var isFighting:Boolean;
 		
 		
 		
@@ -154,11 +153,11 @@ package states
 			moveDirX=0;
 			moveDirY=0;
 			
-			speedX=0.8;
-			speedY=0.8;
+			speedX=0;
+			speedY=0;
 			
 			//Defines the hero scale
-			heroScale=0.7;
+			heroScale=0.6;
 			
 			// Define keyboard interactions - moved to the Hero class
 			CitrusEngine.getInstance().input.keyboard.addKeyAction("left", Keyboard.LEFT);
@@ -208,27 +207,64 @@ package states
 			_armatureClip.y = stage.stageHeight >> 1;
 			_armatureClip.pivotX = _armatureClip.width >> 1;
 			
-			
 			// if want the character to be build on the left this value need to be negative
-		
 			_armatureClip.scaleY = _armatureClip.scaleX = heroScale;
+		
 			//the design wasn't made on the center registration point but close to the top left.
 			dragon = new Hero("teo", {x:0, width:0, height:0, offsetY:0 / 2, view:_armatureClip, registration:"topLeft"});
 			
 			// dragon's initial position
 			dragon.x = stage.stageWidth-100;
 			dragon.y= stage.stageHeight/2;
-			_armature.animation.gotoAndPlay("walking", -1, -1, true);
-			
-			
+			//_armature.animation.gotoAndPlay("walking", -1, -1, true);
+					
 			add(dragon);
 			_camera.setUp(dragon, new Point(stage.stageWidth / 2, stage.stageHeight / 2), _bounds, new Point(0.05, 0.05));
 			//_camera.allowRotation = true;
 			
-			WorldClock.clock.add(_armature);
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyEventHandler);
+			stage.addEventListener(KeyboardEvent.KEY_UP, onKeyEventHandler);
 			
+			WorldClock.clock.add(_armature);			
+		}
+		
+		private function onKeyEventHandler(e:KeyboardEvent):void
+		{
+			isDown	= CitrusEngine.getInstance().input.isDoing("down");
+			isUp	= CitrusEngine.getInstance().input.isDoing("up");
+			isLeft	= CitrusEngine.getInstance().input.isDoing("left");
+			isRight	= CitrusEngine.getInstance().input.isDoing("right");
+						
+			var dirX:int;
+			if (isLeft && isRight) 
+			{
+				dirX=moveDirX;
+				return;
+			}
+			else if (isLeft)
+			{
+				dirX=-1;
 
+			}
+			else if (isRight)
+			{
+				dirX=1;
+
+			}else
+			{
+				dirX=0;
+			}
+			if(dirX==moveDirX)
+			{
+				return;
+			}
+			else
+			{
+				moveDirX=dirX;
+			}
+			updateBehavior();
 			
+			//fazer trace ao moveDirX dirX no update behavior variavel nao esta retornando a 0
 		}
 		
 		private function drawHUD():void
@@ -257,8 +293,6 @@ package states
 			// Enemy's initial position
 			enemy.x = stage.stageWidth-200;
 			enemy.y= stage.stageHeight/2;
-			
-
 		}
 		
 		//essa função levava como parametro um starling event
@@ -285,7 +319,19 @@ package states
 		override public function update(timeDelta:Number):void {
 			super.update(timeDelta);
 			
+			//how much time has passed
+			elapsed = timeDelta;
 			
+			//Update background animation
+			bg.update(timeDelta);
+			bg.speed = 0;
+			
+			//update player's movements
+			updateMove();
+			//call worldClock to animate armature
+			WorldClock.clock.advanceTime(-1);
+			
+
 			
 			/* 
 			__________.__                                                  .__        __   
@@ -296,21 +342,6 @@ package states
 			\/\/         \/             \/     \/         |__|        
 			
 			*/
-			
-			isDown=  CitrusEngine.getInstance().input.isDoing("down");
-			isUp= CitrusEngine.getInstance().input.isDoing("up");
-			isLeft=  CitrusEngine.getInstance().input.isDoing("left");
-			isRight= CitrusEngine.getInstance().input.isDoing("right");
-			
-			//call worldClock to animate armature
-			WorldClock.clock.advanceTime(-1);
-			
-			//how much time has passed
-			elapsed = timeDelta;
-			
-			//Update background animation
-			bg.update(timeDelta);
-			bg.speed = 0;
 											
 			// Confine the hero to stage area limit			
 			// Height
@@ -324,51 +355,18 @@ package states
 			// Right side
 			_ladoDirOffset		=(_ladoDir*_alturaYAtualPerc) / 100;
 			_ladoDirOffset		= -(_ladoDirOffset-100);
-			
-			if (isLeft && isRight|| isUp && isDown) 
-			{
-				//dirX=moveDirX;
-				//dirY=moveDirY;
-				return;
-			}
-			if (isLeft)
-			{
-				dragon.x -= 5 * speedX;
-				dirX=-1;
-				dragon.inverted = true;
-			}
-			if (isRight)
-			{
-				dragon.x+= 5 * speedX;
-				dragon.inverted = false;
-				
-				dirX=1;
-			}
-			if (isUp)
-			{
-				dragon.y -= 5 * speedY;
-				dirY=-1;
-			}
-			if (isDown)
-			{
-				dragon.y += 5 * speedY;
-				dirY=1;
-			}
-			
-			
+					
 			if(CitrusEngine.getInstance().input.justDid("punch")){
 				punch();
 			}
 	
 			if(CitrusEngine.getInstance().input.justDid("kick")){
 				kick();
-			}
-			//updateBehavior();
-			updateMove();
-			trace("Kick = " + CitrusEngine.getInstance().input.justDid("kick"));
-			//trace("hero.y" + hero.y);
-			//trace("hero.x" + hero.x);
-			//trace("_bottom.x" + _bottom.x);
+			}			
+
+			
+			
+		//trace("_bottom.x" + _bottom.x);
 			//trace("_bottom.y" + _bottom.y);
 			//trace("_bottom.width" + _bottom.width);
 			//trace("_bottom.height" + _bottom.height);
@@ -399,33 +397,33 @@ package states
 		
 		private function updateMove():void
 		{
-
-		}
-		
-		
+			trace("speedX" + speedX);
+			if(speedX !=0)
+			{
+				dragon.x += speedX;
+			}
+		}	
 		
 		private function updateBehavior():void 
 		{
-			
-			
-			/*
-			if (isJumping)
-			{
-			return;
-			}
-			*/
-			
-			if (moveDirX == 0 && moveDirY == 0)
+			//if (isFighting)
+			//{
+				//return;
+			//}
+			if (moveDirX == 0)
 			{
 				speedX = 0;
-				_armature.animation.gotoAndPlay("stand");
+				_armature.animation.gotoAndPlay("stand", -1, -1, true);
 			}
 			else
 			{
-				//_armatureClip.scaleX = -moveDirX;
-				_armature.animation.gotoAndPlay("walking");
+				speedX=5*moveDirX;
+				_armature.animation.gotoAndPlay("walking", -1, -1, true);
+				if(isRight)
+					dragon.inverted = false;
+				if(isLeft)
+					dragon.inverted = true;
 			}
-		
 		}
 	}
 }
