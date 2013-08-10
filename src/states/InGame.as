@@ -216,7 +216,7 @@ package states
 			// dragon's initial position
 			dragon.x = stage.stageWidth-100;
 			dragon.y= stage.stageHeight/2;
-			//_armature.animation.gotoAndPlay("walking", -1, -1, true);
+			_armature.animation.gotoAndPlay("stand", -1, -1, true);
 					
 			add(dragon);
 			_camera.setUp(dragon, new Point(stage.stageWidth / 2, stage.stageHeight / 2), _bounds, new Point(0.05, 0.05));
@@ -261,17 +261,19 @@ package states
 					punch();
 					break;
 			}
-						
+					
+			
+			trace("moveDirX" + moveDirX);
+			trace("speedX" + speedX);
+			
+			trace("speedY =" + speedY);
+			trace("moveDirY" + moveDirY);
+			
 			var dirX:int;
 			var dirY:int;
 			if (isLeft && isRight) 
 			{
 				dirX=moveDirX;
-				return;
-			}
-			else if (isUp && isDown)
-			{
-				dirY=moveDirY;
 				return;
 			}
 			else if (isLeft)
@@ -281,9 +283,16 @@ package states
 			else if (isRight)
 			{
 				dirX=1;
+			}else
+			{
+				dirX=0;
 			}
-
-			else if (isUp)
+			
+			if (isUp && isDown) 
+			{
+				dirY=moveDirY;
+				return;
+			}else if (isUp)
 			{
 				dirY=-1;
 			}
@@ -293,60 +302,21 @@ package states
 			}
 			else
 			{
-				dirX=0;
 				dirY=0;
-			}
+			}			
 			
-			trace("dirX==moveDirX ||dirY==moveDirY =" + dirX +moveDirX);
-			if(dirX==moveDirX ||dirY==moveDirY )
+			if(dirX==moveDirX && dirY==moveDirY)
 			{
 				return;
 			}
 			else
 			{
 				moveDirX=dirX;
-				dirY=moveDirY;
+				moveDirY=dirY;
+				
 			}
-			trace("Pega no meu pau");
 			updateBehavior();
-		
-			/*
-			var dirY:int;
-			if (isUp && isDown) 
-			{
-				
-				dirY=moveDirY;
-				return;
-			}
-			else if (isUp)
-			{
-				
-				dirY=-1;
-			}
-			else if (isDown)
-			{
-				dirY=1;
-			}
-			else
-			{
-				
-				dirY=0;
-			}
-		
-			
-			if(dirY==moveDirY)
-			{
-				return;
-			}
-			else
-			{
-					moveDirY=dirY;
-			}
-			
-					
-			updateBehavior();*/
-			
-			//fazer trace ao moveDirX dirX no update behavior variavel nao esta retornando a 0
+
 		}
 		
 		private function drawHUD():void
@@ -447,11 +417,7 @@ package states
 			
 
 			
-			trace("moveDirX" + moveDirX);
-			trace("speedX" + speedX);
-			
-			trace("speedY =" + speedY);
-			trace("moveDirY" + moveDirY);
+
 			//trace("_alturaYAtualPerc" + _alturaYAtualPerc);
 			//trace("_alturaYAtual" + _alturaYAtual);	
 		}
@@ -492,8 +458,9 @@ package states
 			{
 				speedX = 0;
 				speedY = 0;
+				
 				_armature.animation.gotoAndPlay("stand", -1, -1, true);
-			}
+			}	
 			else
 			{
 				speedX=5*moveDirX;
