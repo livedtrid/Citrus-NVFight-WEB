@@ -66,6 +66,7 @@ package states
 		private var gameState:int;
 		
 		/** Player's speed. */
+		private var playerSpeed:Number; // this will be the player actual speed
 		private var speedX:Number;
 		private var speedY:Number;
 		
@@ -149,6 +150,9 @@ package states
 			_factory = new StarlingFactory();
 			_factory.addEventListener(Event.COMPLETE, _textureCompleteHandler);
 			_factory.parseData(new _ResourcesData());
+			
+			// Set the player speed 
+			playerSpeed = 2;
 			
 			moveDirX=0;
 			moveDirY=0;
@@ -394,18 +398,7 @@ package states
 			\/\/         \/             \/     \/         |__|        
 			*/
 											
-			// Confine the hero to stage area limit			
-			// Height
-			_alturaYAtual 		= (hero.y - hero.height >> 1 ) - (_top.y); // verificar a altura do rect
-			_alturaYAtualPerc 	= (_alturaYAtual * 100)/_alturaY + 80;
-			
-			// Left side
-			_ladoEsqOffset		=(_ladoEsq*_alturaYAtualPerc) / 100;
-			_ladoEsqOffset		= -(_ladoEsqOffset-100);
-			
-			// Right side
-			_ladoDirOffset		=(_ladoDir*_alturaYAtualPerc) / 100;
-			_ladoDirOffset		= -(_ladoDirOffset-100);
+
 					
 			if(CitrusEngine.getInstance().input.justDid("punch")){
 				punch();
@@ -434,11 +427,26 @@ package states
 			//_armature.animation.gotoAndPlay("left punch");
 		}
 		
+		
+		//Update the hero's movements
 		private function updateMove():void
 		{
+			// Confine the hero to stage area limit			
+			// Height
+			_alturaYAtual 		= (hero.y - hero.height >> 1 ) - (_top.y); // verificar a altura do rect
+			_alturaYAtualPerc 	= (_alturaYAtual * 100)/_alturaY + 80;
+			
+			// Left side
+			_ladoEsqOffset		=(_ladoEsq*_alturaYAtualPerc) / 100;
+			_ladoEsqOffset		= -(_ladoEsqOffset-100);
+			
+			// Right side
+			_ladoDirOffset		=(_ladoDir*_alturaYAtualPerc) / 100;
+			_ladoDirOffset		= -(_ladoDirOffset-100);
+			
 			
 			if(speedX !=0)
-			{
+			{		
 				dragon.x += speedX;
 			}
 			
@@ -463,8 +471,8 @@ package states
 			}	
 			else
 			{
-				speedX=5*moveDirX;
-				speedY=5*moveDirY;
+				speedX=playerSpeed*moveDirX;
+				speedY=playerSpeed*moveDirY;
 				
 				_armature.animation.gotoAndPlay("walking", -1, -1, true);
 				if(isRight)
