@@ -1,7 +1,10 @@
 package core
 {
+
 	import citrus.core.starling.StarlingCitrusEngine;
+	
 	import starling.events.Event;
+	
 	import states.InGame;
 	
 	
@@ -10,6 +13,7 @@ package core
 	{
 		public function Main()
 		{
+			
 			setUpStarling(true);
 		}
 		

@@ -10,7 +10,7 @@ package states
 	import citrus.input.controllers.TimeShifter;
 	import citrus.view.ACitrusCamera;
 	import citrus.view.starlingview.StarlingCamera;
-	
+		
 	import core.Assets;
 	
 	import dragonBones.Armature;
@@ -123,11 +123,14 @@ package states
 		{
 			super();
 			
+
+			
 		// Is hardware rendering?
 			isHardwareRendering = Starling.context.driverInfo.toLowerCase().indexOf("software") == -1;
 		}
 		
 		
+
 		/** Constrains the gameArea */
 		public function get alturaY():Number
 		{
@@ -205,6 +208,8 @@ package states
 			_factory.removeEventListener(Event.COMPLETE, _textureCompleteHandler);
 			
 			_armature = _factory.buildArmature("teo");
+			//Set animation speed
+			_armature.animation.timeScale = 0.8;
 			
 			_armatureClip = _armature.display as Sprite;
 			_armatureClip.x = stage.stageWidth >> 1;
