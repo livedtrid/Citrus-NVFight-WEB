@@ -51,15 +51,15 @@ offsetY = Math.ceil(-_view.height/2);
 				_view.fps = (speed == 0) ? 20 : 60;
 			}
 			
-			override public function get width():Number
-			{
-				return _view ? view.texture.width : NaN;
-			}
+			//override public function get width():Number
+			//{
+				//return _view ? view.texture.width : NaN;
+			//}
 			
-			override public function get height():Number
-			{
-				return _view ? view.texture.height : NaN;
-			}
+			//override public function get height():Number
+			//{
+				//return _view ? view.texture.height : NaN;
+			//}
 			
 			override public function update(timeDelta:Number):void
 			{

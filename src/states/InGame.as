@@ -116,6 +116,7 @@ package states
 		private var _armatureClip:Sprite;
 		private var heroScale:Number;
 		private var isFighting:Boolean;
+		private var heroIsAdded:Boolean=false;
 		
 		
 		
@@ -175,12 +176,12 @@ package states
 			CitrusEngine.getInstance().input.keyboard.addKeyAction("punch", Keyboard.X);
 				
 			// Define game area.
-			_top 		= new Rectangle(100, 200, 1600, 20);
+			_top 		= new Rectangle(250, 200, 1100, 20);
 			_bottom  	= new Rectangle(0, 450, 1600, 20);
 			_alturaY 	= _bottom.y - _top.y;
 			_ladoEsq 	= _top.x - _bottom.x;
-			_ladoDir 	= (_bottom.x + _bottom.width) - (_top.x + _top.width) ; 
-				
+			_ladoDir 	= (_bottom.x + _bottom.width) - (_top.x + _top.width) ;
+
 			// Reset hit, camera shake and player speed.
 			getHit = 0;
 			cameraShake = 0;
@@ -220,14 +221,14 @@ package states
 			_armatureClip.scaleY = _armatureClip.scaleX = heroScale;
 		
 			//the design wasn't made on the center registration point but close to the top left.
-			dragon = new Hero("teo", {x:0, width:0, height:0, offsetY:0 / 2, view:_armatureClip, registration:"topLeft"});
+			dragon = new Hero("teo", {x:0, width:_armatureClip.width, height:_armatureClip.height, offsetY:0 / 2, view:_armatureClip, registration:"topLeft"});
 			
 			// dragon's initial position
 			dragon.x = stage.stageWidth-100;
-			dragon.y= stage.stageHeight/2;
+			dragon.y= 310;
 			_armature.animation.gotoAndPlay("stand", -1, -1, true);
-					
 			add(dragon);
+			heroIsAdded=true;
 			_camera.setUp(dragon, new Point(stage.stageWidth / 2, stage.stageHeight / 2), _bounds, new Point(0.05, 0.05));
 			//_camera.allowRotation = true;
 			
@@ -270,14 +271,7 @@ package states
 					punch();
 					break;
 			}
-					
-			
-			trace("moveDirX" + moveDirX);
-			trace("speedX" + speedX);
-			
-			trace("speedY =" + speedY);
-			trace("moveDirY" + moveDirY);
-			
+	
 			var dirX:int;
 			var dirY:int;
 			if (isLeft && isRight) 
@@ -321,8 +315,7 @@ package states
 			else
 			{
 				moveDirX=dirX;
-				moveDirY=dirY;
-				
+				moveDirY=dirY;				
 			}
 			updateBehavior();
 
@@ -339,15 +332,7 @@ package states
 			bg = new GameBackground("background");
 			add(bg);
 			
-			// Draw hero.
-			hero = new Hero("hero", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
-			// Hero's initial position	
-			hero.x = stage.stageWidth/2;
-			hero.y = stage.stageHeight/2;
-			//add(hero);
-			hero.view.scaleX = hero.view.scaleY = heroScale;
-			
-			// Draw hero.
+			//Draw enemy
 			enemy = new Enemy("enemy", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
 			//add(enemy);
 				
@@ -392,29 +377,13 @@ package states
 			//call worldClock to animate armature
 			WorldClock.clock.advanceTime(-1);
 			
-
-			
-			/* 
-			__________.__                                                  .__        __   
-			\______   \  | _____  ___.__. ___________    ______ ___________|__|______/  |_ 
-			|     ___/  | \__  \<   |  |/ __ \_  __ \  /  ___// ___\_  __ \  \____ \   __\
-			|    |   |  |__/ __ \\___  \  ___/|  | \/  \___ \\  \___|  | \/  |  |_> >  |  
-			|____|   |____(____  / ____|\___  >__|    /____  >\___  >__|  |__|   __/|__|  
-			\/\/         \/             \/     \/         |__|        
-			*/
-											
-
-					
 			if(CitrusEngine.getInstance().input.justDid("punch")){
 				punch();
 			}
 	
 			if(CitrusEngine.getInstance().input.justDid("kick")){
 				kick();
-			}		
-			
-
-			
+			}				
 
 			//trace("_alturaYAtualPerc" + _alturaYAtualPerc);
 			//trace("_alturaYAtual" + _alturaYAtual);	
@@ -422,12 +391,21 @@ package states
 		
 		private function kick():void
 		{
+			if(isFighting)
+			{
+				return;
+			}
 			_armature.animation.gotoAndPlay("kick");
 		}
 		
 		//soco
 		private function punch():void
 		{
+			if(isFighting)
+			{
+				return;
+			}
+			isFighting=true;
 			 _armature.animation.gotoAndPlay("right punch");
 			//_armature.animation.gotoAndPlay("left punch");
 		}
@@ -436,10 +414,21 @@ package states
 		//Update the hero's movements
 		private function updateMove():void
 		{
+			/* 
+			__________.__                                                  .__        __   
+			\______   \  | _____  ___.__. ___________    ______ ___________|__|______/  |_ 
+			|     ___/  | \__  \<   |  |/ __ \_  __ \  /  ___// ___\_  __ \  \____ \   __\
+			|    |   |  |__/ __ \\___  \  ___/|  | \/  \___ \\  \___|  | \/  |  |_> >  |  
+			|____|   |____(____  / ____|\___  >__|    /____  >\___  >__|  |__|   __/|__|  
+			\/\/         \/             \/     \/         |__|        
+			*/			
+			
+			if(heroIsAdded)
+			{
 			// Confine the hero to stage area limit			
 			// Height
-			_alturaYAtual 		= (hero.y - hero.height >> 1 ) - (_top.y); // verificar a altura do rect
-			_alturaYAtualPerc 	= (_alturaYAtual * 100)/_alturaY + 80;
+			_alturaYAtual 		= (dragon.y - dragon.height >> 1 ) - (_top.y); // verificar a altura do rect
+			_alturaYAtualPerc 	= (_alturaYAtual * 100)/_alturaY;
 			
 			// Left side
 			_ladoEsqOffset		=(_ladoEsq*_alturaYAtualPerc) / 100;
@@ -447,17 +436,51 @@ package states
 			
 			// Right side
 			_ladoDirOffset		=(_ladoDir*_alturaYAtualPerc) / 100;
-			_ladoDirOffset		= -(_ladoDirOffset-100);
+			_ladoDirOffset		= -(_ladoDirOffset-100);			
 			
-			
+			if(isFighting){
+				dragon.x = dragon.x;
+				dragon.y = dragon.y;
+			}
 			if(speedX !=0)
 			{		
-				dragon.x += speedX;
+				if (dragon.x + 5  > _bottom.x + (dragon.width/2) +_ladoEsqOffset&&isLeft)
+				{
+					dragon.x += speedX;
+				}
+				else if((dragon.x + 5) < (_bottom.x + _bottom.width + (dragon.width/2)) - _ladoDirOffset&&isRight)
+				{
+					dragon.x += speedX;
+				}else
+				{
+					dragon.x += 0;
+				}
+				
 			}
 			
 			if(speedY !=0)
 			{
-				dragon.y += speedY;
+				if((dragon.y + 5) >= _top.y &&isUp)
+				{
+					if (dragon.x + 5  > _bottom.x + (dragon.width/2) +_ladoEsqOffset){
+						dragon.x -= 5;
+					}
+					
+					if ((dragon.x + 5) < (_bottom.x + _bottom.width + (dragon.width/2)) - _ladoDirOffset){
+						dragon.x += 5;
+					}
+					
+					dragon.y += speedY;
+					
+				}
+				else if((dragon.y + 5) <= (_bottom.y)&&isDown ){
+					dragon.y += speedY;
+				}
+				else
+				{
+					dragon.y += 0;
+				}				
+			}
 			}
 		}	
 		
