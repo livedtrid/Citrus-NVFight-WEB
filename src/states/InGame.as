@@ -10,11 +10,12 @@ package states
 	import citrus.input.controllers.TimeShifter;
 	import citrus.view.ACitrusCamera;
 	import citrus.view.starlingview.StarlingCamera;
-		
+	
 	import core.Assets;
 	
 	import dragonBones.Armature;
 	import dragonBones.animation.WorldClock;
+	import dragonBones.events.AnimationEvent;
 	import dragonBones.factorys.StarlingFactory;
 	
 	import objects.hero.Hero;
@@ -70,9 +71,6 @@ package states
 		private var speedX:Number;
 		private var speedY:Number;
 		
-		/** The power of obstacle after it is hit. */
-		private var getHit:Number = 0;
-		
 		/** How much to shake the camera when the player get hits? */
 		private var cameraShake:Number;
 		
@@ -124,28 +122,11 @@ package states
 		{
 			super();
 			
-
-			
 		// Is hardware rendering?
 			isHardwareRendering = Starling.context.driverInfo.toLowerCase().indexOf("software") == -1;
 		}
 		
 		
-
-		/** Constrains the gameArea */
-		public function get alturaY():Number
-		{
-			return _alturaY;
-		}
-
-		/**
-		 * @private
-		 */
-		public function set alturaY(value:Number):void
-		{
-			_alturaY = value;
-		}
-
 		override public function initialize():void {
 			
 			super.initialize();	
@@ -182,18 +163,16 @@ package states
 			_ladoEsq 	= _top.x - _bottom.x;
 			_ladoDir 	= (_bottom.x + _bottom.width) - (_top.x + _top.width) ;
 
-			// Reset hit, camera shake and player speed.
-			getHit = 0;
+			// Reset hit, camera shake
 			cameraShake = 0;
 			
 			_bounds = new Rectangle(0, 0, 1600, 480); //camera boundaries
 			_camera = view.camera as StarlingCamera;
-			//_camera.setUp(hero, new Point(stage.stageWidth / 2, stage.stageHeight / 2), _bounds, new Point(0.05, 0.05));
 			//_camera.allowRotation = true;
 			_camera.allowZoom = true;
 			
 			//_camera.parallaxMode = ACitrusCamera.PARALLAX_MODE_TOPLEFT;
-			//_camera.boundsMode = ACitrusCamera.BOUNDS_MODE_AABB;
+			_camera.boundsMode = ACitrusCamera.BOUNDS_MODE_AABB;
 			
 			drawGame();
 			drawHUD();
@@ -201,6 +180,25 @@ package states
 			// Reset game paused states.
 			gamePaused = false;
 			bg.gamePaused = false;
+		}
+		
+		override public function update(timeDelta:Number):void {
+			super.update(timeDelta);
+			
+			//how much time has passed
+			elapsed = timeDelta;
+			
+			//Update background animation
+			bg.update(timeDelta);
+			bg.speed = 0;
+			
+			//update player's movements
+			updateMove();
+			//call worldClock to animate armature
+			WorldClock.clock.advanceTime(-1);
+			
+			trace("_isAttacking =" + _isAttacking);
+			
 		}
 		
 		//Draonbones
@@ -228,24 +226,22 @@ package states
 			dragon.y= 310;
 			_armature.animation.gotoAndPlay("stand", -1, -1, true);
 			add(dragon);
+			
+			WorldClock.clock.add(_armature);
+			
 			heroIsAdded=true;
 			_camera.setUp(dragon, new Point(stage.stageWidth / 2, stage.stageHeight / 2), _bounds, new Point(0.05, 0.05));
-			//_camera.allowRotation = true;
-			
+					
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyEventHandler);
 			stage.addEventListener(KeyboardEvent.KEY_UP, onKeyEventHandler);
 			
-			WorldClock.clock.add(_armature);			
+			_armature.addEventListener(AnimationEvent.MOVEMENT_CHANGE, animationHandler);
+			_armature.addEventListener(AnimationEvent.COMPLETE, animationHandler);
+								
 		}
 		
 		private function onKeyEventHandler(e:KeyboardEvent):void
-		{
-			/*isDown	= CitrusEngine.getInstance().input.justDid("down");
-			isUp	= CitrusEngine.getInstance().input.justDid("up");
-			isLeft	= CitrusEngine.getInstance().input.justDid("left");
-			isRight	= CitrusEngine.getInstance().input.justDid("right");
-			*/
-			
+		{			
 			switch (e.keyCode)
 			{
 				case Keyboard.A :
@@ -362,66 +358,59 @@ package states
 			}
 		}
 		
-		override public function update(timeDelta:Number):void {
-			super.update(timeDelta);
-			
-			//how much time has passed
-			elapsed = timeDelta;
-			
-			//Update background animation
-			bg.update(timeDelta);
-			bg.speed = 0;
-			
-			//update player's movements
-			updateMove();
-			//call worldClock to animate armature
-			WorldClock.clock.advanceTime(-1);
-			
-			if(CitrusEngine.getInstance().input.justDid("punch")){
-				punch();
-			}
-	
-			if(CitrusEngine.getInstance().input.justDid("kick")){
-				kick();
-			}				
 
-			//trace("_alturaYAtualPerc" + _alturaYAtualPerc);
-			//trace("_alturaYAtual" + _alturaYAtual);	
-		}
 		
 		private function kick():void
 		{
-			if(isFighting)
+			if(_isAttacking)
 			{
 				return;
 			}
+			_isAttacking=true;
 			_armature.animation.gotoAndPlay("kick");
 		}
 		
 		//soco
 		private function punch():void
 		{
-			if(isFighting)
+			if(_isAttacking)
 			{
 				return;
 			}
-			isFighting=true;
+			_isAttacking=true;
+			
+			var punchType:Number=Math.ceil(Math.random()*2);
+			if(punchType==1)
 			 _armature.animation.gotoAndPlay("right punch");
-			//_armature.animation.gotoAndPlay("left punch");
+			if(punchType==2)
+			_armature.animation.gotoAndPlay("left punch");
+		}
+		
+		private function animationHandler(e:AnimationEvent):void 
+		{
+			trace("animationHandler");
+			switch(e.type)
+			{
+				case AnimationEvent.MOVEMENT_CHANGE:
+					_isComboAttack = false;
+					break;
+				case AnimationEvent.COMPLETE:
+					if(_isComboAttack)
+					{
+						
+					}
+					else
+					{
+						_isAttacking = false;
+					}
+					break;
+			}
 		}
 		
 		
 		//Update the hero's movements
 		private function updateMove():void
-		{
-			/* 
-			__________.__                                                  .__        __   
-			\______   \  | _____  ___.__. ___________    ______ ___________|__|______/  |_ 
-			|     ___/  | \__  \<   |  |/ __ \_  __ \  /  ___// ___\_  __ \  \____ \   __\
-			|    |   |  |__/ __ \\___  \  ___/|  | \/  \___ \\  \___|  | \/  |  |_> >  |  
-			|____|   |____(____  / ____|\___  >__|    /____  >\___  >__|  |__|   __/|__|  
-			\/\/         \/             \/     \/         |__|        
-			*/			
+		{	
 			
 			if(heroIsAdded)
 			{
@@ -488,7 +477,7 @@ package states
 		{
 			if (isFighting)
 			{
-				//return;
+				return;
 			}
 			if (moveDirX == 0 && moveDirY == 0)
 			{
@@ -508,6 +497,21 @@ package states
 				if(isLeft)
 					dragon.inverted = true;
 			}
+		}
+		
+		
+		private var _isAttacking:Boolean;
+		private var _isComboAttack:Boolean;
+		private var _hitCount:uint = 1;
+		private function attack():void 
+		{
+			if (_isAttacking) 
+			{
+				return;
+			}
+			_isAttacking = true;
+		
+			_armature.animation.gotoAndPlay("punch");
 		}
 	}
 }
