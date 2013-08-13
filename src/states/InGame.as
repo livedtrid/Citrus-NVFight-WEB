@@ -115,6 +115,7 @@ package states
 		private var heroScale:Number;
 		private var isFighting:Boolean;
 		private var heroIsAdded:Boolean=false;
+		private var _isAttacking:Boolean;
 		
 		
 		
@@ -197,7 +198,7 @@ package states
 			//call worldClock to animate armature
 			WorldClock.clock.advanceTime(-1);
 			
-			trace("_isAttacking =" + _isAttacking);
+			
 			
 		}
 		
@@ -358,6 +359,24 @@ package states
 			}
 		}
 		
+		
+		private function animationHandler(e:AnimationEvent):void 
+		{
+			
+			switch(e.type)
+			{
+				case AnimationEvent.MOVEMENT_CHANGE:
+					//_isAttacking = false;
+					trace("MOVEMENT_CHANGE");
+					break;
+				case AnimationEvent.COMPLETE:
+					trace("COMPLETE");
+					_isAttacking = false;
+					break;
+			}
+			trace("_isAttacking =" + _isAttacking);
+			
+		} 
 
 		
 		private function kick():void
@@ -386,26 +405,7 @@ package states
 			_armature.animation.gotoAndPlay("left punch");
 		}
 		
-		private function animationHandler(e:AnimationEvent):void 
-		{
-			trace("animationHandler");
-			switch(e.type)
-			{
-				case AnimationEvent.MOVEMENT_CHANGE:
-					_isComboAttack = false;
-					break;
-				case AnimationEvent.COMPLETE:
-					if(_isComboAttack)
-					{
-						
-					}
-					else
-					{
-						_isAttacking = false;
-					}
-					break;
-			}
-		}
+
 		
 		
 		//Update the hero's movements
@@ -414,62 +414,62 @@ package states
 			
 			if(heroIsAdded)
 			{
-			// Confine the hero to stage area limit			
-			// Height
-			_alturaYAtual 		= (dragon.y - dragon.height >> 1 ) - (_top.y); // verificar a altura do rect
-			_alturaYAtualPerc 	= (_alturaYAtual * 100)/_alturaY;
+				// Confine the hero to stage area limit			
+				// Height
+				_alturaYAtual 		= (dragon.y - dragon.height >> 1 ) - (_top.y); // verificar a altura do rect
+				_alturaYAtualPerc 	= (_alturaYAtual * 100)/_alturaY;
 			
-			// Left side
-			_ladoEsqOffset		=(_ladoEsq*_alturaYAtualPerc) / 100;
-			_ladoEsqOffset		= -(_ladoEsqOffset-100);
-			
-			// Right side
-			_ladoDirOffset		=(_ladoDir*_alturaYAtualPerc) / 100;
-			_ladoDirOffset		= -(_ladoDirOffset-100);			
-			
-			if(isFighting){
-				dragon.x = dragon.x;
-				dragon.y = dragon.y;
-			}
-			if(speedX !=0)
-			{		
-				if (dragon.x + 5  > _bottom.x + (dragon.width/2) +_ladoEsqOffset&&isLeft)
-				{
-					dragon.x += speedX;
+				// Left side
+				_ladoEsqOffset		=(_ladoEsq*_alturaYAtualPerc) / 100;
+				_ladoEsqOffset		= -(_ladoEsqOffset-100);
+				
+				// Right side
+				_ladoDirOffset		=(_ladoDir*_alturaYAtualPerc) / 100;
+				_ladoDirOffset		= -(_ladoDirOffset-100);			
+				
+				if(isFighting){
+					dragon.x = dragon.x;
+					dragon.y = dragon.y;
 				}
-				else if((dragon.x + 5) < (_bottom.x + _bottom.width + (dragon.width/2)) - _ladoDirOffset&&isRight)
-				{
-					dragon.x += speedX;
-				}else
-				{
-					dragon.x += 0;
+				if(speedX !=0)
+				{		
+					if (dragon.x + 5  > _bottom.x + (dragon.width/2) +_ladoEsqOffset&&isLeft)
+					{
+						dragon.x += speedX;
+					}
+					else if((dragon.x + 5) < (_bottom.x + _bottom.width + (dragon.width/2)) - _ladoDirOffset&&isRight)
+					{
+						dragon.x += speedX;
+					}else
+					{
+						dragon.x += 0;
+					}
+					
 				}
 				
-			}
-			
-			if(speedY !=0)
-			{
-				if((dragon.y + 5) >= _top.y &&isUp)
+				if(speedY !=0)
 				{
-					if (dragon.x + 5  > _bottom.x + (dragon.width/2) +_ladoEsqOffset){
-						dragon.x -= 5;
+					if((dragon.y + 5) >= _top.y &&isUp)
+					{
+						if (dragon.x + 5  > _bottom.x + (dragon.width/2) +_ladoEsqOffset){
+							dragon.x -= 5;
+						}
+						
+						if ((dragon.x + 5) < (_bottom.x + _bottom.width + (dragon.width/2)) - _ladoDirOffset){
+							dragon.x += 5;
+						}
+						
+						dragon.y += speedY;
+						
 					}
-					
-					if ((dragon.x + 5) < (_bottom.x + _bottom.width + (dragon.width/2)) - _ladoDirOffset){
-						dragon.x += 5;
+					else if((dragon.y + 5) <= (_bottom.y)&&isDown ){
+						dragon.y += speedY;
 					}
-					
-					dragon.y += speedY;
-					
+					else
+					{
+						dragon.y += 0;
+					}				
 				}
-				else if((dragon.y + 5) <= (_bottom.y)&&isDown ){
-					dragon.y += speedY;
-				}
-				else
-				{
-					dragon.y += 0;
-				}				
-			}
 			}
 		}	
 		
@@ -497,21 +497,6 @@ package states
 				if(isLeft)
 					dragon.inverted = true;
 			}
-		}
-		
-		
-		private var _isAttacking:Boolean;
-		private var _isComboAttack:Boolean;
-		private var _hitCount:uint = 1;
-		private function attack():void 
-		{
-			if (_isAttacking) 
-			{
-				return;
-			}
-			_isAttacking = true;
-		
-			_armature.animation.gotoAndPlay("punch");
-		}
+		}	
 	}
 }
