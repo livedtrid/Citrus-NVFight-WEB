@@ -28,8 +28,7 @@ package states
 	import starling.events.KeyboardEvent;
 
 	public class InGame extends StarlingState
-	{
-		
+	{		
 		/** Game background object. */
 		private var bg:GameBackground;
 		
@@ -148,15 +147,7 @@ package states
 			
 			//Defines the hero scale
 			heroScale=0.6;
-			
-			// Define keyboard interactions - moved to the Hero class
-			CitrusEngine.getInstance().input.keyboard.addKeyAction("left", Keyboard.LEFT);
-			CitrusEngine.getInstance().input.keyboard.addKeyAction("right", Keyboard.RIGHT);
-			CitrusEngine.getInstance().input.keyboard.addKeyAction("down", Keyboard.DOWN);
-			CitrusEngine.getInstance().input.keyboard.addKeyAction("up", Keyboard.UP);
-			CitrusEngine.getInstance().input.keyboard.addKeyAction("kick", Keyboard.Z);
-			CitrusEngine.getInstance().input.keyboard.addKeyAction("punch", Keyboard.X);
-				
+
 			// Define game area.
 			_top 		= new Rectangle(250, 200, 1100, 20);
 			_bottom  	= new Rectangle(0, 450, 1600, 20);
@@ -315,7 +306,6 @@ package states
 				moveDirY=dirY;				
 			}
 			updateBehavior();
-
 		}
 		
 		private function drawHUD():void
@@ -372,6 +362,7 @@ package states
 				case AnimationEvent.COMPLETE:
 					trace("COMPLETE");
 					_isAttacking = false;
+					updateBehavior();//return to stand animation
 					break;
 			}
 			trace("_isAttacking =" + _isAttacking);
@@ -411,6 +402,9 @@ package states
 		//Update the hero's movements
 		private function updateMove():void
 		{	
+			if(isFighting){
+				return;
+			}
 			
 			if(heroIsAdded)
 			{
@@ -427,10 +421,7 @@ package states
 				_ladoDirOffset		=(_ladoDir*_alturaYAtualPerc) / 100;
 				_ladoDirOffset		= -(_ladoDirOffset-100);			
 				
-				if(isFighting){
-					dragon.x = dragon.x;
-					dragon.y = dragon.y;
-				}
+
 				if(speedX !=0)
 				{		
 					if (dragon.x + 5  > _bottom.x + (dragon.width/2) +_ladoEsqOffset&&isLeft)
