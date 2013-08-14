@@ -4,7 +4,6 @@ package states
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	
-	import citrus.core.CitrusEngine;
 	import citrus.core.starling.StarlingState;
 	import citrus.input.controllers.Keyboard;
 	import citrus.input.controllers.TimeShifter;
@@ -112,7 +111,6 @@ package states
 		private var moveDirY:int;
 		private var _armatureClip:Sprite;
 		private var heroScale:Number;
-		private var isFighting:Boolean;
 		private var heroIsAdded:Boolean=false;
 		private var _isAttacking:Boolean;
 		
@@ -137,7 +135,7 @@ package states
 			_factory.parseData(new _ResourcesData());
 			
 			// Set the player speed 
-			playerSpeed = 2;
+			playerSpeed = 1.5;
 			
 			moveDirX=0;
 			moveDirY=0;
@@ -187,10 +185,7 @@ package states
 			//update player's movements
 			updateMove();
 			//call worldClock to animate armature
-			WorldClock.clock.advanceTime(-1);
-			
-			
-			
+			WorldClock.clock.advanceTime(-1);			
 		}
 		
 		//Draonbones
@@ -214,8 +209,8 @@ package states
 			dragon = new Hero("teo", {x:0, width:_armatureClip.width, height:_armatureClip.height, offsetY:0 / 2, view:_armatureClip, registration:"topLeft"});
 			
 			// dragon's initial position
-			dragon.x = stage.stageWidth-100;
-			dragon.y= 310;
+			dragon.x = 800;
+			dragon.y= 300;
 			_armature.animation.gotoAndPlay("stand", -1, -1, true);
 			add(dragon);
 			
@@ -236,6 +231,12 @@ package states
 		{			
 			switch (e.keyCode)
 			{
+				case Keyboard.X :
+					kick();
+					break;
+				case Keyboard.Z :
+					punch();
+					break;
 				case Keyboard.A :
 				case Keyboard.LEFT :
 					isLeft=e.type == KeyboardEvent.KEY_DOWN;
@@ -252,19 +253,16 @@ package states
 				case Keyboard.UP :
 					isUp=e.type == KeyboardEvent.KEY_DOWN;
 					break;
-				case Keyboard.X :
-					kick();
-					break;
-				case Keyboard.Z :
-					punch();
-					break;
 			}
 	
 			var dirX:int;
 			var dirY:int;
-			if (isLeft && isRight) 
+			
+			if (isLeft && isRight||_isAttacking) 
 			{
-				dirX=moveDirX;
+				dirX=0;
+				moveDirX=0;
+				//dirX=moveDirX;
 				return;
 			}
 			else if (isLeft)
@@ -402,7 +400,7 @@ package states
 		//Update the hero's movements
 		private function updateMove():void
 		{	
-			if(isFighting){
+			if(_isAttacking){
 				return;
 			}
 			
@@ -424,9 +422,19 @@ package states
 
 				if(speedX !=0)
 				{		
+					if(dragon.x >= 500 && dragon.x <= 1100)
+					{
+						bg.speed=speedX * 0.01;
+					}else{
+						bg.speed=0;
+					}
+					
+				
+					
 					if (dragon.x + 5  > _bottom.x + (dragon.width/2) +_ladoEsqOffset&&isLeft)
 					{
 						dragon.x += speedX;
+						
 					}
 					else if((dragon.x + 5) < (_bottom.x + _bottom.width + (dragon.width/2)) - _ladoDirOffset&&isRight)
 					{
@@ -434,6 +442,7 @@ package states
 					}else
 					{
 						dragon.x += 0;
+						bg.speed=0;
 					}
 					
 				}
@@ -466,7 +475,7 @@ package states
 		
 		private function updateBehavior():void 
 		{
-			if (isFighting)
+			if (_isAttacking)
 			{
 				return;
 			}
