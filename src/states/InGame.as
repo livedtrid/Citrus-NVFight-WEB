@@ -148,7 +148,7 @@ package states
 
 			// Define game area.
 			_top 		= new Rectangle(250, 200, 1100, 20);
-			_bottom  	= new Rectangle(0, 450, 1600, 20);
+			_bottom  	= new Rectangle(0, 480, 1600, 20);
 			_alturaY 	= _bottom.y - _top.y;
 			_ladoEsq 	= _top.x - _bottom.x;
 			_ladoDir 	= (_bottom.x + _bottom.width) - (_top.x + _top.width) ;
@@ -211,6 +211,7 @@ package states
 			// dragon's initial position
 			dragon.x = 800;
 			dragon.y= 300;
+			//dragon.pivotX = dragon.width >>1;
 			_armature.animation.gotoAndPlay("stand", -1, -1, true);
 			add(dragon);
 			
@@ -257,12 +258,20 @@ package states
 	
 			var dirX:int;
 			var dirY:int;
-			
-			if (isLeft && isRight||_isAttacking) 
+			if(_isAttacking){
+				
+				return;
+			}
+			if (isLeft && isRight) 
 			{
-				dirX=0;
-				moveDirX=0;
-				//dirX=moveDirX;
+	
+				dirX=moveDirX;
+				
+				if(dirX==1)
+					isLeft=false;
+				if(dirX==0)
+					isRight=false;
+				
 				return;
 			}
 			else if (isLeft)
@@ -392,7 +401,7 @@ package states
 			 _armature.animation.gotoAndPlay("right punch");
 			if(punchType==2)
 			_armature.animation.gotoAndPlay("left punch");
-		}
+			}
 		
 
 		
@@ -428,9 +437,7 @@ package states
 					}else{
 						bg.speed=0;
 					}
-					
-				
-					
+										
 					if (dragon.x + 5  > _bottom.x + (dragon.width/2) +_ladoEsqOffset&&isLeft)
 					{
 						dragon.x += speedX;

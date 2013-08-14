@@ -22,8 +22,6 @@ package core
 			super._context3DCreated(evt);
 			
 			state = new InGame();
-			
-			//_starling.stage.addChild(new Game());
 		}
 	}
 }
