@@ -14,4 +14,31 @@
 	<natures>
 		<nature>com.adobe.flexbuilder.project.actionscriptnature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>[source path] Citrus-Engine_05_08_2013-src</name>
+			<type>2</type>
+			<locationURI>DOCUMENTS/libs/Citrus-Engine_05_08_2013/src</locationURI>
+		</link>
+		<link>
+			<name>[source path] extension-src</name>
+			<type>2</type>
+			<locationURI>DOCUMENTS/libs/Starling-Extension-Graphics/extension/src</locationURI>
+		</link>
+		<link>
+			<name>[source path] source</name>
+			<type>2</type>
+			<locationURI>DOCUMENTS/libs/feathers_05_08_2013/source</locationURI>
+		</link>
+		<link>
+			<name>[source path] srclib</name>
+			<type>2</type>
+			<locationURI>DOCUMENTS/libs/Citrus-Engine_05_08_2013/srclib</locationURI>
+		</link>
+		<link>
+			<name>[source path] starling-src</name>
+			<type>2</type>
+			<locationURI>DOCUMENTS/libs/Starling-Framework_05_08_2013/starling/src</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

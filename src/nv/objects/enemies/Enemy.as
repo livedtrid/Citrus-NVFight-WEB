@@ -1,4 +1,4 @@
-package objects.objects {
+package nv.objects.enemies {
 	
 	import citrus.objects.CitrusSprite;
 	

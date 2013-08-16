@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker http://www.codeandweb.com/texturepacker-->
+<!-- $TexturePacker:SmartUpdate:e1fe6f5fe9446a91dea851dcfe200c26:1/1$ -->
+<TextureAtlas imagePath="mySpritesheet.png">
+    <SubTexture name="bgLayer1" x="2" y="2" width="1602" height="484"/>
+    <SubTexture name="bgLayer2" x="2" y="488" width="1613" height="225"/>
+    <SubTexture name="bgLayer3" x="2" y="715" width="1772" height="383"/>
+    <SubTexture name="bgLayer4" x="2" y="1100" width="2030" height="595"/>
+</TextureAtlas>

@@ -1,4 +1,4 @@
-package objects.objects
+package nv.objects.objects
 {
 	import starling.display.Quad;
 	import starling.utils.VertexData;

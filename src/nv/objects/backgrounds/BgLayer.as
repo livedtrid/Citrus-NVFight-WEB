@@ -1,6 +1,6 @@
-package objects.backgrounds{
+package nv.objects.backgrounds{
 		
-		import util.Assets;
+		import nv.util.Assets;
 		
 		import starling.display.BlendMode;
 		import starling.display.Image;
@@ -44,6 +44,8 @@ package objects.backgrounds{
 			{
 				this.removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 				
+				image1 = new Image(Assets.getAtlas().getTexture("bgLayer" + _layer));
+				/*
 				if (_layer == 1)
 				{
 					image1 = new Image(Assets.getTexture("BgLayer" + _layer));
@@ -56,8 +58,9 @@ package objects.backgrounds{
 					image1 = new Image(Assets.getAtlas().getTexture("bgLayer" + _layer));
 					//image2 = new Image(Assets.getAtlas().getTexture("bgLayer" + _layer));
 				}
+				*/
 				
-				image1.x = 0;
+				image1.x = 1600 - image1.width >> 1;
 				image1.y = stage.stageHeight - image1.height;
 				
 				//image2.x = image2.width;

@@ -1,7 +1,7 @@
-package objects.hero {
+package nv.objects.hero {
 		
-		//import citrus.objects.CitrusSprite;
-		import citrus.objects.platformer.simple.Hero;
+		import citrus.objects.CitrusSprite;
+		//import citrus.objects.platformer.simple.Hero;
 		
 		//import games.hungryhero.GameConstants;
 		
@@ -11,7 +11,7 @@ package objects.hero {
 		 * @author hsharma
 		 * 
 		 */
-		public class Hero extends citrus.objects.platformer.simple.Hero
+		public class Hero extends CitrusSprite
 		{		
 			/** State of the hero. */
 			public var state:int;
@@ -38,7 +38,7 @@ package objects.hero {
 				/** Hero character animation. */
 				
 				offsetX = Math.ceil(-_view.width/2);
-offsetY = Math.ceil(-_view.height/2);
+				offsetY = Math.ceil(-_view.height/2);
 			}
 			
 			/**

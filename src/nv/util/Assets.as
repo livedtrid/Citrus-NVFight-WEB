@@ -1,4 +1,4 @@
-package util{
+package nv.util{
 		
 		import starling.textures.Texture;
 		import starling.textures.TextureAtlas;
@@ -24,16 +24,16 @@ package util{
 			/**
 			 * Texture Atlas 
 			 */
-			[Embed(source="assets/mySpritesheet.png")]
+			[Embed(source="src/assets/images/mySpritesheet.png")]
 			public static const AtlasTextureGame:Class;
 			
-			[Embed(source="assets/mySpritesheet.xml", mimeType="application/octet-stream")]
+			[Embed(source="src/assets/images/mySpritesheet.xml", mimeType="application/octet-stream")]
 			public static const AtlasXmlGame:Class;
 			
 			/**
 			 * Background Assets 
 			 */
-			[Embed(source="assets/bgLayer1.png")]
+			[Embed(source="src/assets/images/bgLayer1.png")]
 			public static const BgLayer1:Class;
 			
 			/**

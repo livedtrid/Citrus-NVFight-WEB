@@ -1,7 +1,6 @@
-package objects.backgrounds{
+package nv.objects.backgrounds{
 	
-	import citrus.objects.CitrusSprite;
-	
+	import citrus.objects.CitrusSprite;	
 	import starling.display.Sprite;
 
 	/**
@@ -24,7 +23,8 @@ package objects.backgrounds{
 		private var bgLayer4:BgLayer;
 		
 		/** Current speed of animation of the background. */
-		public var speed:Number = 0;
+	
+	public var speed:Number = 0;
 		
 		/** State of the game. */		
 		public var state:int;
@@ -40,18 +40,24 @@ package objects.backgrounds{
 			
 			_view = _container;
 			
+			//Sky
 			bgLayer1 = new BgLayer(1);
 			bgLayer1.parallaxDepth = 0.002;
 			_container.addChild(bgLayer1);
 			
+			//Mountains
 			bgLayer2 = new BgLayer(2);
+		bgLayer2.y =-250;
 			bgLayer2.parallaxDepth = 0.02;
 			_container.addChild(bgLayer2);
 			
+			//Hills
 			bgLayer3 = new BgLayer(3);
+			bgLayer3.y =-30;
 			bgLayer3.parallaxDepth = 0.05;
 			_container.addChild(bgLayer3);
 			
+			//Grass
 			bgLayer4 = new BgLayer(4);
 			//bgLayer4.parallaxDepth = 0;
 			_container.addChild(bgLayer4);

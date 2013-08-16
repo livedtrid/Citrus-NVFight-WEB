@@ -1,4 +1,4 @@
-package states
+package nv.states
 {
 	import flash.events.Event;
 	import flash.geom.Point;
@@ -10,19 +10,16 @@ package states
 	import citrus.view.ACitrusCamera;
 	import citrus.view.starlingview.StarlingCamera;
 	
-	import util.Assets;
-	
 	import dragonBones.Armature;
 	import dragonBones.animation.WorldClock;
 	import dragonBones.events.AnimationEvent;
 	import dragonBones.factorys.StarlingFactory;
 	
-	import objects.hero.Hero;
-	import objects.objects.Enemy;
-	import objects.backgrounds.GameBackground;
+	import nv.objects.hero.Hero;
+	import nv.objects.enemies.Enemy;
+	import nv.objects.backgrounds.GameBackground;
 	
 	import starling.core.Starling;
-	import starling.display.MovieClip;
 	import starling.display.Sprite;
 	import starling.events.KeyboardEvent;
 
@@ -98,7 +95,7 @@ package states
 		private var _bottom:Rectangle;
 		
 		// Dragon Bones
-		[Embed(source="assets/teo_output.png",mimeType="application/octet-stream")]
+		[Embed(source="src/assets/images/teo.png",mimeType="application/octet-stream")]
 		private const _ResourcesData:Class;		
 		private var _factory:StarlingFactory;
 		private var _armature:Armature;
@@ -333,12 +330,12 @@ package states
 			add(bg);
 			
 			//Draw enemy
-			enemy = new Enemy("enemy", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
+			//enemy = new Enemy("enemy", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
 			//add(enemy);
 				
 			// Enemy's initial position
-			enemy.x = stage.stageWidth-200;
-			enemy.y= stage.stageHeight/2;
+			//enemy.x = stage.stageWidth-200;
+			//enemy.y= stage.stageHeight/2;
 		}
 		
 		//essa função levava como parametro um starling event
