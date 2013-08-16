@@ -10,7 +10,7 @@ package states
 	import citrus.view.ACitrusCamera;
 	import citrus.view.starlingview.StarlingCamera;
 	
-	import core.Assets;
+	import util.Assets;
 	
 	import dragonBones.Armature;
 	import dragonBones.animation.WorldClock;
@@ -19,7 +19,7 @@ package states
 	
 	import objects.hero.Hero;
 	import objects.objects.Enemy;
-	import objects.objects.GameBackground;
+	import objects.backgrounds.GameBackground;
 	
 	import starling.core.Starling;
 	import starling.display.MovieClip;
@@ -32,7 +32,7 @@ package states
 		private var bg:GameBackground;
 		
 		/** Hero character. */		
-		private var hero:Hero;
+	
 		
 		/** Enemy character */
 		private var enemy:Enemy;
@@ -102,7 +102,7 @@ package states
 		private const _ResourcesData:Class;		
 		private var _factory:StarlingFactory;
 		private var _armature:Armature;
-		private var dragon:Hero;// Substitui o hero depois quando ficar a funcionar
+		private var hero:Hero;
 		private var isRight:Boolean;
 		private var isDown:Boolean;
 		private var isUp:Boolean;
@@ -147,12 +147,14 @@ package states
 			heroScale=0.6;
 
 			// Define game area.
-			_top 		= new Rectangle(250, 200, 1100, 20);
-			_bottom  	= new Rectangle(0, 480, 1600, 20);
+			_top 		= new Rectangle(300, 250, 1000, 20);
+			_bottom  	= new Rectangle(60, 450, 1480, 20);
 			_alturaY 	= _bottom.y - _top.y;
 			_ladoEsq 	= _top.x - _bottom.x;
-			_ladoDir 	= (_bottom.x + _bottom.width) - (_top.x + _top.width) ;
+			_ladoDir 	= (_bottom.x + _bottom.width) - (_top.x + _top.width);
+			
 
+			
 			// Reset hit, camera shake
 			cameraShake = 0;
 			
@@ -195,30 +197,32 @@ package states
 			
 			_armature = _factory.buildArmature("teo");
 			//Set animation speed
-			_armature.animation.timeScale = 0.8;
+			_armature.animation.timeScale = 0.9;
+			//_armature.colorTransform.color = 0x112233;
 			
 			_armatureClip = _armature.display as Sprite;
 			_armatureClip.x = stage.stageWidth >> 1;
 			_armatureClip.y = stage.stageHeight >> 1;
-			_armatureClip.pivotX = _armatureClip.width >> 1;
+			//_armatureClip.pivotX = _armatureClip.width >> 1;
+			//_armatureClip.pivotY = _armatureClip.height >> 1;
 			
 			// if want the character to be build on the left this value need to be negative
 			_armatureClip.scaleY = _armatureClip.scaleX = heroScale;
 		
 			//the design wasn't made on the center registration point but close to the top left.
-			dragon = new Hero("teo", {x:0, width:_armatureClip.width, height:_armatureClip.height, offsetY:0 / 2, view:_armatureClip, registration:"topLeft"});
+			hero = new Hero("teo", {x:0, width:_armatureClip.width, height:_armatureClip.height, view:_armatureClip, registration:"center"});
 			
 			// dragon's initial position
-			dragon.x = 800;
-			dragon.y= 300;
+			hero.x = 800;
+			hero.y= 300;
 			//dragon.pivotX = dragon.width >>1;
 			_armature.animation.gotoAndPlay("stand", -1, -1, true);
-			add(dragon);
-			
+			add(hero);
+						
 			WorldClock.clock.add(_armature);
 			
 			heroIsAdded=true;
-			_camera.setUp(dragon, new Point(stage.stageWidth / 2, stage.stageHeight / 2), _bounds, new Point(0.05, 0.05));
+			_camera.setUp(hero, new Point(stage.stageWidth / 2, stage.stageHeight / 2), _bounds, new Point(0.05, 0.05));
 					
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyEventHandler);
 			stage.addEventListener(KeyboardEvent.KEY_UP, onKeyEventHandler);
@@ -260,11 +264,13 @@ package states
 			var dirY:int;
 			if(_isAttacking){
 				
+				moveDirX=0;
+				moveDirY=0;
+				
 				return;
 			}
 			if (isLeft && isRight) 
 			{
-	
 				dirX=moveDirX;
 				
 				if(dirX==1)
@@ -364,16 +370,11 @@ package states
 			{
 				case AnimationEvent.MOVEMENT_CHANGE:
 					//_isAttacking = false;
-					trace("MOVEMENT_CHANGE");
 					break;
 				case AnimationEvent.COMPLETE:
-					trace("COMPLETE");
-					_isAttacking = false;
 					updateBehavior();//return to stand animation
 					break;
 			}
-			trace("_isAttacking =" + _isAttacking);
-			
 		} 
 
 		
@@ -411,44 +412,55 @@ package states
 		{	
 			if(_isAttacking){
 				return;
-			}
-			
+			}			
 			if(heroIsAdded)
 			{
 				// Confine the hero to stage area limit			
 				// Height
-				_alturaYAtual 		= (dragon.y - dragon.height >> 1 ) - (_top.y); // verificar a altura do rect
+				_alturaYAtual 		= hero.y - _top.y; // verificar a altura do rect
 				_alturaYAtualPerc 	= (_alturaYAtual * 100)/_alturaY;
 			
 				// Left side
 				_ladoEsqOffset		=(_ladoEsq*_alturaYAtualPerc) / 100;
-				_ladoEsqOffset		= -(_ladoEsqOffset-100);
+				_ladoEsqOffset		= -(_ladoEsqOffset-200);
 				
 				// Right side
 				_ladoDirOffset		=(_ladoDir*_alturaYAtualPerc) / 100;
-				_ladoDirOffset		= -(_ladoDirOffset-100);			
+				_ladoDirOffset		= -(_ladoDirOffset-200);			
 				
 
 				if(speedX !=0)
 				{		
-					if(dragon.x >= 500 && dragon.x <= 1100)
+					//Move background
+					if(hero.x >= 500 && hero.x <= 1100)
 					{
 						bg.speed=speedX * 0.01;
 					}else{
 						bg.speed=0;
 					}
-										
-					if (dragon.x + 5  > _bottom.x + (dragon.width/2) +_ladoEsqOffset&&isLeft)
+						//constrains player movement in gamearea		
+					if (hero.x - hero.width > _bottom.x +_ladoEsqOffset&&isLeft || hero.x + hero.width < (_bottom.x + _bottom.width)  - _ladoDirOffset&&isRight)
 					{
-						dragon.x += speedX;
 						
-					}
-					else if((dragon.x + 5) < (_bottom.x + _bottom.width + (dragon.width/2)) - _ladoDirOffset&&isRight)
-					{
-						dragon.x += speedX;
+						trace("hero.x =" + hero.x);
+						trace("hero.y =" + hero.y);
+						//trace("hero.width  =" + hero.width );
+						trace("_ladoDirOffset =" + _ladoDirOffset);
+						trace("_ladoEsqOffset =" + _ladoEsqOffset);
+						trace("_alturaYAtual ="+_alturaYAtual);
+						trace("_alturaYAtualPerc ="+_alturaYAtualPerc);
+						
+						//trace("_top = " +_top);
+						//trace("_bottom = " +_bottom);
+						//trace("_alturaY = " +_alturaY);
+						trace("_ladoEsq = " +_ladoEsq);
+						trace("_ladoDir = " +_ladoDir);
+						
+						hero.x += speedX;
+						
 					}else
 					{
-						dragon.x += 0;
+						hero.x += 0;
 						bg.speed=0;
 					}
 					
@@ -456,25 +468,25 @@ package states
 				
 				if(speedY !=0)
 				{
-					if((dragon.y + 5) >= _top.y &&isUp)
+					if(hero.y  > _top.y &&isUp)
 					{
-						if (dragon.x + 5  > _bottom.x + (dragon.width/2) +_ladoEsqOffset){
-							dragon.x -= 5;
+						if (hero.x - hero.width > _bottom.x +_ladoEsqOffset){
+							hero.x -= playerSpeed;
 						}
 						
-						if ((dragon.x + 5) < (_bottom.x + _bottom.width + (dragon.width/2)) - _ladoDirOffset){
-							dragon.x += 5;
+						if (hero.x + hero.width < (_bottom.x + _bottom.width)  - _ladoDirOffset){
+							hero.x += playerSpeed;
 						}
 						
-						dragon.y += speedY;
+						hero.y += speedY;
 						
 					}
-					else if((dragon.y + 5) <= (_bottom.y)&&isDown ){
-						dragon.y += speedY;
+					else if(hero.y  - hero.height/2 < _bottom.y&&isDown ){
+						hero.y += speedY;
 					}
 					else
 					{
-						dragon.y += 0;
+						hero.y += 0;
 					}				
 				}
 			}
@@ -482,27 +494,35 @@ package states
 		
 		private function updateBehavior():void 
 		{
+			trace("_isAttacking" +_isAttacking);
+
 			if (_isAttacking)
 			{
-				return;
+				trace("moveDirX" +moveDirX);
+				trace("moveDirY" +moveDirY);
+	
+				_isAttacking = false;	
+				//return;
 			}
-			if (moveDirX == 0 && moveDirY == 0)
+			if (moveDirX != 0 || moveDirY != 0)
 			{
-				speedX = 0;
-				speedY = 0;
+				//speedX = 0;
+				//speedY = 0;
 				
-				_armature.animation.gotoAndPlay("stand", -1, -1, true);
-			}	
-			else
-			{
+				//_armature.animation.gotoAndPlay("stand", -1, -1, true);
+				
 				speedX=playerSpeed*moveDirX;
 				speedY=playerSpeed*moveDirY;
 				
 				_armature.animation.gotoAndPlay("walking", -1, -1, true);
 				if(isRight)
-					dragon.inverted = false;
+					hero.inverted = false;
 				if(isLeft)
-					dragon.inverted = true;
+					hero.inverted = true;
+			}	
+			else
+			{
+				_armature.animation.gotoAndPlay("stand", -1, -1, true);
 			}
 		}	
 	}

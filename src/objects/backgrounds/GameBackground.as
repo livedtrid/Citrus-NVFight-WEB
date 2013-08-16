@@ -1,4 +1,4 @@
-package objects.objects{
+package objects.backgrounds{
 	
 	import citrus.objects.CitrusSprite;
 	
@@ -53,7 +53,7 @@ package objects.objects{
 			_container.addChild(bgLayer3);
 			
 			bgLayer4 = new BgLayer(4);
-			bgLayer4.parallaxDepth = 0;
+			//bgLayer4.parallaxDepth = 0;
 			_container.addChild(bgLayer4);
 			
 		}

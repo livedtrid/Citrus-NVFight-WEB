@@ -1,6 +1,6 @@
-package objects.objects{
+package objects.backgrounds{
 		
-		import core.Assets;
+		import util.Assets;
 		
 		import starling.display.BlendMode;
 		import starling.display.Image;
