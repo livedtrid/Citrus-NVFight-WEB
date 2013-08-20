@@ -18,7 +18,8 @@ package nv.states
 	import nv.objects.backgrounds.GameBackground;
 	import nv.objects.enemies.Enemy;
 	import nv.objects.hero.Hero;
-		
+	import nv.util.Assets;
+	
 	import starling.core.Starling;
 	import starling.display.Sprite;
 	import starling.events.KeyboardEvent;
@@ -95,8 +96,8 @@ package nv.states
 		private var _bottom:Rectangle;
 		
 		// Dragon Bones
-		[Embed(source="src/assets/images/teo.png",mimeType="application/octet-stream")]
-		private const _ResourcesData:Class;
+		//[Embed(source="src/assets/images/teo.png",mimeType="application/octet-stream")]
+		//private const _ResourcesData:Class;
 		private var _factory:StarlingFactory;
 		private var _armature:Armature;
 		private var _armatureClip:Sprite;
@@ -132,7 +133,7 @@ package nv.states
 			//Dragonbones
 			_factory = new StarlingFactory();
 			_factory.addEventListener(Event.COMPLETE, _textureCompleteHandler);
-			_factory.parseData(new _ResourcesData());
+			_factory.parseData(new Assets.HeroTeoData());
 			
 			// Set the player speed 
 			playerSpeed = 1.5;
@@ -400,10 +401,12 @@ package nv.states
 			
 			var punchType:Number=Math.ceil(Math.random()*2);
 			if(punchType==1)
-			 _armature.animation.gotoAndPlay("right punch");
+			 _armature.animation.gotoAndPlay("right punch", 0.1);
 			if(punchType==2)
-			_armature.animation.gotoAndPlay("left punch");
-			}
+			_armature.animation.gotoAndPlay("left punch",  0.1);
+			
+		}
+x		
 		
 
 		
@@ -505,25 +508,27 @@ package nv.states
 				_isAttacking = false;	
 				//return;
 			}
-			if (moveDirX != 0 || moveDirY != 0)
+			if (moveDirX == 0 && moveDirY == 0)
 			{
 				//speedX = 0;
 				//speedY = 0;
 				
 				//_armature.animation.gotoAndPlay("stand", -1, -1, true);
+				_armature.animation.gotoAndPlay("stand", 0.1, -1, true);
+
+			}	
+			else
+			{		
+	
 				
-				speedX=playerSpeed*moveDirX;
-				speedY=playerSpeed*moveDirY;
-				
-				_armature.animation.gotoAndPlay("walking", -1, -1, true);
+				_armature.animation.gotoAndPlay("walking", 0, 1.5, true);
 				if(isRight)
 					hero.inverted = false;
 				if(isLeft)
 					hero.inverted = true;
-			}	
-			else
-			{
-				_armature.animation.gotoAndPlay("stand", -1, -1, true);
+				
+				speedX=playerSpeed*moveDirX;
+				speedY=playerSpeed*moveDirY;
 			}
 		}	
 	}

@@ -16,10 +16,13 @@ package nv.util{
 		 */
 		public class Assets
 		{
+			//Embed Dragonbones Teo
+			[Embed(source="src/assets/images/teo.png",mimeType="application/octet-stream")]
+			public static const HeroTeoData:Class;
 			
 			//Enemy Tiker01 Dragonbones
 			[Embed(source="src/assets/images/tyker1.png",mimeType="application/octet-stream")]
-			public static const _enemyTyker1Data:Class;	
+			public static const EnemyTyker1Data:Class;	
 			
 			/**
 			 * Texture Atlas 
