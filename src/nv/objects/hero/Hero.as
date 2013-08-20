@@ -1,14 +1,11 @@
 package nv.objects.hero {
 		
 		import citrus.objects.CitrusSprite;
-		//import citrus.objects.platformer.simple.Hero;
-		
-		//import games.hungryhero.GameConstants;
 		
 		/**
 		 * This class is the hero character.
 		 *  
-		 * @author hsharma
+		 * @author livedtrid
 		 * 
 		 */
 		public class Hero extends CitrusSprite

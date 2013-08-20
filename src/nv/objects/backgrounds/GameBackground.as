@@ -47,14 +47,14 @@ package nv.objects.backgrounds{
 			
 			//Mountains
 			bgLayer2 = new BgLayer(2);
-		bgLayer2.y =-250;
+			bgLayer2.y =-250;
 			bgLayer2.parallaxDepth = 0.02;
 			_container.addChild(bgLayer2);
 			
 			//Hills
 			bgLayer3 = new BgLayer(3);
 			bgLayer3.y =-30;
-			bgLayer3.parallaxDepth = 0.05;
+			bgLayer3.parallaxDepth = 0.04;
 			_container.addChild(bgLayer3);
 			
 			//Grass
@@ -79,10 +79,10 @@ package nv.objects.backgrounds{
 				bgLayer2.x -= (speed * bgLayer2.parallaxDepth * 400);
 				bgLayer3.x -= (speed * bgLayer3.parallaxDepth * 400);
 				
-	/*		
+			/*		
 			bgLayer1.x -=- Math.ceil(speed * bgLayer1.parallaxDepth);
-				trace("speed * bgLayer1.parallaxDepth" + speed * bgLayer1.parallaxDepth);
-				trace("Math.ceil(speed * bgLayer1.parallaxDepth)" + Math.ceil(speed * bgLayer1.parallaxDepth));
+			trace("speed * bgLayer1.parallaxDepth" + speed * bgLayer1.parallaxDepth);
+			trace("Math.ceil(speed * bgLayer1.parallaxDepth)" + Math.ceil(speed * bgLayer1.parallaxDepth));
 		
 			bgLayer2.x -= Math.ceil(speed * bgLayer2.parallaxDepth);
 			

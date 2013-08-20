@@ -2,7 +2,6 @@ package nv.objects.backgrounds{
 		
 		import nv.util.Assets;
 		
-		import starling.display.BlendMode;
 		import starling.display.Image;
 		import starling.display.Sprite;
 		import starling.events.Event;

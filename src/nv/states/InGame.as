@@ -6,7 +6,6 @@ package nv.states
 	
 	import citrus.core.starling.StarlingState;
 	import citrus.input.controllers.Keyboard;
-	import citrus.input.controllers.TimeShifter;
 	import citrus.view.ACitrusCamera;
 	import citrus.view.starlingview.StarlingCamera;
 	
@@ -29,14 +28,43 @@ package nv.states
 		/** Game background object. */
 		private var bg:GameBackground;
 		
-		/** Hero character. */		
+		/** Hero character. */
+		private var hero:Hero;
 	
+		/** Player state. */		
+		private var gameState:int;
 		
-		/** Enemy character */
-		private var enemy:Enemy;
+		/** Player's speed. */
+		private var playerSpeed:Number; // this will be the player actual speed
+		private var speedX:Number;
+		private var speedY:Number;
+		
+		/** Dragonbones  */
+		private var _factory:StarlingFactory;
+		private var _armature:Armature;
+		private var _armatureClip:Sprite;
+		
+		/** Player's direction */
+		private var isRight:Boolean=false;
+		private var isDown:Boolean=false;
+		private var isUp:Boolean=false;
+		private var isLeft:Boolean=false;
+		
+		/** Dragonbones  */
+		private var moveDirX:int;
+		private var moveDirY:int;
+		
+		/** Scale of character  */
+		private var heroScale:Number;
+		
+		private var heroIsAdded:Boolean=false;
+		private var _isAttacking:Boolean;
 		
 		/** Time calculation for animation. */
 		private var elapsed:Number;
+		
+		/** Enemy character */
+		private var enemy:Enemy;
 		
 		// ------------------------------------------------------------------------------------------------------------
 		// GAME INTERACTION 
@@ -59,19 +87,10 @@ package nv.states
 		/** Is game currently in paused state? */
 		private var gamePaused:Boolean = false;
 		
-		/** Player state. */		
-		private var gameState:int;
-		
-		/** Player's speed. */
-		private var playerSpeed:Number; // this will be the player actual speed
-		private var speedX:Number;
-		private var speedY:Number;
-		
 		/** How much to shake the camera when the player get hits? */
 		private var cameraShake:Number;
 		
-		/** Buffer */
-		private var timeshifter:TimeShifter;
+		/** Camera and game boundaries */
 		private var _camera:ACitrusCamera;
 		private var _bounds:Rectangle;		
 		
@@ -88,35 +107,14 @@ package nv.states
 		private var _ladoDir:Number;
 		private var _ladoDirOffset:Number;	
 
-		// ------------------------------------------------------------------------------------------------------------
-		// METHODS
-		// ------------------------------------------------------------------------------------------------------------
-		
+		// Rectangles
 		private var _top:Rectangle;
 		private var _bottom:Rectangle;
 		
-		// Dragon Bones
-		//[Embed(source="src/assets/images/teo.png",mimeType="application/octet-stream")]
-		//private const _ResourcesData:Class;
-		private var _factory:StarlingFactory;
-		private var _armature:Armature;
-		private var _armatureClip:Sprite;
-		
-		
-		private var hero:Hero;
-		private var isRight:Boolean;
-		private var isDown:Boolean;
-		private var isUp:Boolean;
-		private var isLeft:Boolean;
-		private var moveDirX:int;
-		private var moveDirY:int;
-		
-		private var heroScale:Number;
-		private var heroIsAdded:Boolean=false;
-		private var _isAttacking:Boolean;
-		
-		
-		
+		// ------------------------------------------------------------------------------------------------------------
+		// METHODS
+		// ------------------------------------------------------------------------------------------------------------
+			
 		public function InGame()
 		{
 			super();
@@ -136,7 +134,7 @@ package nv.states
 			_factory.parseData(new Assets.HeroTeoData());
 			
 			// Set the player speed 
-			playerSpeed = 1.5;
+			playerSpeed = 1.25;
 			
 			moveDirX=0;
 			moveDirY=0;
@@ -202,22 +200,16 @@ package nv.states
 			//_armature.colorTransform.color = 0x112233;
 			
 			_armatureClip = _armature.display as Sprite;
-			_armatureClip.x = stage.stageWidth >> 1;
-			_armatureClip.y = stage.stageHeight >> 1;
-			
-					//_armatureClip.pivotX = _armatureClip.width >> 1;
-			//_armatureClip.pivotY = _armatureClip.height >> 1;
 			
 			// if want the character to be build on the left this value need to be negative
 			_armatureClip.scaleY = _armatureClip.scaleX = heroScale;
 		
-			//the design wasn't made on the center registration point but close to the top left.
 			hero = new Hero("teo", {x:0, width:_armatureClip.width, height:_armatureClip.height, view:_armatureClip, registration:"center"});
 			
-			// dragon's initial position
+			// hero's initial position
 			hero.x = 800;
 			hero.y= 300;
-			//dragon.pivotX = dragon.width >>1;
+		
 			_armature.animation.gotoAndPlay("stand", -1, -1, true);
 			add(hero);
 						
@@ -372,9 +364,12 @@ package nv.states
 			{
 				case AnimationEvent.MOVEMENT_CHANGE:
 					//_isAttacking = false;
+					if(_isAttacking)
+						updateBehavior();
 					break;
 				case AnimationEvent.COMPLETE:
-					updateBehavior();//return to stand animation
+					//updateBehavior();//return to stand animation
+					_isAttacking = false;
 					break;
 			}
 		} 
@@ -397,25 +392,22 @@ package nv.states
 			{
 				return;
 			}
-			_isAttacking=true;
+			_isAttacking = true;
 			
 			var punchType:Number=Math.ceil(Math.random()*2);
 			if(punchType==1)
-			 _armature.animation.gotoAndPlay("right punch", 0.1);
+			 _armature.animation.gotoAndPlay("right punch");
 			if(punchType==2)
-			_armature.animation.gotoAndPlay("left punch",  0.1);
-			
-		}
-x		
-		
-
-		
+			_armature.animation.gotoAndPlay("left punch");
+		}		
 		
 		//Update the hero's movements
 		private function updateMove():void
 		{	
 			if(_isAttacking){
 				return;
+			//	_isAttacking=false;
+				//updateBehavior();
 			}			
 			if(heroIsAdded)
 			{
@@ -432,7 +424,7 @@ x
 				_ladoDirOffset		=(_ladoDir*_alturaYAtualPerc) / 100;
 				_ladoDirOffset		= -(_ladoDirOffset-200);			
 				
-
+				//constrains player movement in gamearea X axis	
 				if(speedX !=0)
 				{		
 					//Move background
@@ -442,23 +434,9 @@ x
 					}else{
 						bg.speed=0;
 					}
-						//constrains player movement in gamearea		
+							
 					if (hero.x - hero.width > _bottom.x +_ladoEsqOffset&&isLeft || hero.x + hero.width < (_bottom.x + _bottom.width)  - _ladoDirOffset&&isRight)
 					{
-						
-						trace("hero.x =" + hero.x);
-						trace("hero.y =" + hero.y);
-						//trace("hero.width  =" + hero.width );
-						trace("_ladoDirOffset =" + _ladoDirOffset);
-						trace("_ladoEsqOffset =" + _ladoEsqOffset);
-						trace("_alturaYAtual ="+_alturaYAtual);
-						trace("_alturaYAtualPerc ="+_alturaYAtualPerc);
-						
-						//trace("_top = " +_top);
-						//trace("_bottom = " +_bottom);
-						//trace("_alturaY = " +_alturaY);
-						trace("_ladoEsq = " +_ladoEsq);
-						trace("_ladoDir = " +_ladoDir);
 						
 						hero.x += speedX;
 						
@@ -470,6 +448,7 @@ x
 					
 				}
 				
+				//constrains player movement in gamearea Y axis	
 				if(speedY !=0)
 				{
 					if(hero.y  > _top.y &&isUp)
@@ -482,8 +461,7 @@ x
 							hero.x += playerSpeed;
 						}
 						
-						hero.y += speedY;
-						
+						hero.y += speedY;						
 					}
 					else if(hero.y  - hero.height/2 < _bottom.y&&isDown ){
 						hero.y += speedY;
@@ -492,43 +470,47 @@ x
 					{
 						hero.y += 0;
 					}				
-				}
+				}			
 			}
 		}	
 		
 		private function updateBehavior():void 
-		{
-			trace("_isAttacking" +_isAttacking);
-
+		{		
 			if (_isAttacking)
-			{
-				trace("moveDirX" +moveDirX);
-				trace("moveDirY" +moveDirY);
-	
-				_isAttacking = false;	
-				//return;
+			{	
+				//_isAttacking = false;	
+				return;
 			}
 			if (moveDirX == 0 && moveDirY == 0)
 			{
-				//speedX = 0;
-				//speedY = 0;
-				
-				//_armature.animation.gotoAndPlay("stand", -1, -1, true);
-				_armature.animation.gotoAndPlay("stand", 0.1, -1, true);
-
+				speedX=0;
+				speedY=0;
+				_armature.animation.gotoAndPlay("stand", -1, -1, true);
 			}	
 			else
-			{		
-	
+			{	
 				
-				_armature.animation.gotoAndPlay("walking", 0, 1.5, true);
+				trace("moveDirX" +moveDirX);
+				trace("moveDirY" +moveDirY);
+				
+				speedX=playerSpeed*moveDirX;
+				speedY=playerSpeed*moveDirY;
+				_armature.animation.gotoAndPlay("walking", -1, 0, true);
+				
+				//Change the facing direction of the player
+				//_armatureClip.scaleX = moveDirX * heroScale;
+				//trace("_armatureClip.width= " + _armatureClip.width);
+				//trace("hero.width= " + hero.width);
+								
 				if(isRight)
 					hero.inverted = false;
 				if(isLeft)
 					hero.inverted = true;
 				
-				speedX=playerSpeed*moveDirX;
-				speedY=playerSpeed*moveDirY;
+				
+				
+				
+
 			}
 		}	
 	}
