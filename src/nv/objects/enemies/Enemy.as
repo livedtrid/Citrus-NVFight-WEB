@@ -1,29 +1,23 @@
 package nv.objects.enemies {
 	
-	import citrus.objects.CitrusSprite;
+	import flash.events.Event;
+
 	
-	//import games.hungryhero.GameConstants;
+	import citrus.objects.CitrusSprite;
 	
 	/**
 	 * This class is the hero character.
 	 *  
-	 * @author hsharma
+	 * @author livedtrid
 	 * 
 	 */
 	public class Enemy extends CitrusSprite
 	{		
-		/** State of the hero. */
-		public var state:int;
-		private var enemySpeed:int =1;
-		
+					
 		public function Enemy(name:String, params:Object=null)
 		{
 			super(name, params);
 			
-			// Set the game state to idle.
-			// this.state = GameConstants.GAME_STATE_IDLE;
-			
-			// Initialize hero art and hit area.
 			createEnemyArt();
 			
 		}
@@ -34,30 +28,23 @@ package nv.objects.enemies {
 		 */
 		private function createEnemyArt():void
 		{
-			/** Hero character animation. */
+
+		}
+		
+		private function _textureCompleteHandler(evt:Event):void {
+
+		
 			
-			offsetX = Math.ceil(-_view.width/2);
-			offsetY = Math.ceil(-_view.height/2);
 		}
 		
 		/**
-		 * Set hero animation speed. 
+		 * Set enemy animation speed. 
 		 * @param speed
 		 * 
 		 */
 		public function setEnemyAnimationSpeed(speed:int):void {
 			
 			_view.fps = (speed == 0) ? 20 : 60;
-		}
-		
-		override public function get width():Number
-		{
-			return _view ? view.texture.width : NaN;
-		}
-		
-		override public function get height():Number
-		{
-			return _view ? view.texture.height : NaN;
 		}
 		
 		override public function update(timeDelta:Number):void

@@ -15,10 +15,10 @@ package nv.states
 	import dragonBones.events.AnimationEvent;
 	import dragonBones.factorys.StarlingFactory;
 	
-	import nv.objects.hero.Hero;
-	import nv.objects.enemies.Enemy;
 	import nv.objects.backgrounds.GameBackground;
-	
+	import nv.objects.enemies.Enemy;
+	import nv.objects.hero.Hero;
+		
 	import starling.core.Starling;
 	import starling.display.Sprite;
 	import starling.events.KeyboardEvent;
@@ -96,9 +96,12 @@ package nv.states
 		
 		// Dragon Bones
 		[Embed(source="src/assets/images/teo.png",mimeType="application/octet-stream")]
-		private const _ResourcesData:Class;		
+		private const _ResourcesData:Class;
 		private var _factory:StarlingFactory;
 		private var _armature:Armature;
+		private var _armatureClip:Sprite;
+		
+		
 		private var hero:Hero;
 		private var isRight:Boolean;
 		private var isDown:Boolean;
@@ -106,7 +109,7 @@ package nv.states
 		private var isLeft:Boolean;
 		private var moveDirX:int;
 		private var moveDirY:int;
-		private var _armatureClip:Sprite;
+		
 		private var heroScale:Number;
 		private var heroIsAdded:Boolean=false;
 		private var _isAttacking:Boolean;
@@ -200,7 +203,8 @@ package nv.states
 			_armatureClip = _armature.display as Sprite;
 			_armatureClip.x = stage.stageWidth >> 1;
 			_armatureClip.y = stage.stageHeight >> 1;
-			//_armatureClip.pivotX = _armatureClip.width >> 1;
+			
+					//_armatureClip.pivotX = _armatureClip.width >> 1;
 			//_armatureClip.pivotY = _armatureClip.height >> 1;
 			
 			// if want the character to be build on the left this value need to be negative

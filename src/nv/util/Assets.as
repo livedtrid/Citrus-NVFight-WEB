@@ -17,9 +17,9 @@ package nv.util{
 		public class Assets
 		{
 			
-			// Dragon Bones
-			//[Embed(source="assets/texture.png",mimeType="application/octet-stream")]
-		//	public static const ResourcesData:Class;
+			//Enemy Tiker01 Dragonbones
+			[Embed(source="src/assets/images/tyker1.png",mimeType="application/octet-stream")]
+			public static const _enemyTyker1Data:Class;	
 			
 			/**
 			 * Texture Atlas 
