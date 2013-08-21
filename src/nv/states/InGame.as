@@ -7,6 +7,7 @@ package nv.states
 	import citrus.core.starling.StarlingState;
 	import citrus.input.controllers.Keyboard;
 	import citrus.view.ACitrusCamera;
+	import citrus.view.spriteview.SpriteArt;
 	import citrus.view.starlingview.StarlingCamera;
 	
 	import dragonBones.Armature;
@@ -325,14 +326,6 @@ package nv.states
 			// Draw background.
 			bg = new GameBackground("background");
 			add(bg);
-			
-			//Draw enemy
-			//enemy = new Enemy("enemy", {view:new MovieClip(Assets.getAtlas().getTextures("teoWalk"), 12)});
-			//add(enemy);
-				
-			// Enemy's initial position
-			//enemy.x = stage.stageWidth-200;
-			//enemy.y= stage.stageHeight/2;
 		}
 		
 		//essa função levava como parametro um starling event
