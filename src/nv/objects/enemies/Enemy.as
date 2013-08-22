@@ -51,7 +51,7 @@ package nv.objects.enemies {
 
 		}
 		
-		//Draonbones
+		//Draonbones//
 		private function _textureCompleteHandler(evt:Event):void {
 			trace("_textureCompleteHandler");
 			
